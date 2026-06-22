@@ -12,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import org.utl.idgs903.appkaaxpark.R
+import org.utl.idgs903.appkaaxpark.global.InfoUsuario
 
 abstract class BaseAdminActivity : AppCompatActivity() {
 
@@ -37,11 +38,13 @@ abstract class BaseAdminActivity : AppCompatActivity() {
         val btnMenuReporte = findViewById<LinearLayout>(R.id.btnMenuReporte)
         val btnMenuSustentabilidad = findViewById<LinearLayout>(R.id.btnMenuSustentabilidad)
         val btnMenuCentralK = findViewById<CardView>(R.id.btnMenuCentralK)
+        val btnInfoUsuario = findViewById<ImageView>(R.id.btnPerfil)
 
         btnMenuDashboard?.setOnClickListener { viajarA(Dashboard::class.java) }
         btnMenuCajones?.setOnClickListener { viajarA(Cajones::class.java) }
         btnMenuReporte?.setOnClickListener { viajarA(Reportes::class.java) }
         btnMenuSustentabilidad?.setOnClickListener { viajarA(Sustentabilidad::class.java) }
+        btnInfoUsuario?.setOnClickListener { viajarA(InfoUsuario::class.java) }
 
         btnMenuCentralK?.setOnClickListener {
             Toast.makeText(this, "K'áaxPark Panel de Control Central", Toast.LENGTH_SHORT).show()

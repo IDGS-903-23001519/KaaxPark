@@ -1,5 +1,4 @@
 plugins {
-    id("com.android.application")
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
 }
@@ -13,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "org.utl.idgs903.appkaaxpark"
+        applicationId = "com.kaax.AppKaaxPark"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -45,4 +44,8 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
+    implementation(platform("com.google.firebase:firebase-bom:34.15.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
 }

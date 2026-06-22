@@ -77,7 +77,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="Usuario"
+                    android:hint="Correo electrónico"
+                    android:inputType="textEmailAddress"
                     android:textColor="#000000"
                     android:textColorHint="#7A7A7A"/>
             </LinearLayout>
