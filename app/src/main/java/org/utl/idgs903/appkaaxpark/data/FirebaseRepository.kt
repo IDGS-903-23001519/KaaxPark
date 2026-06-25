@@ -9,12 +9,15 @@ data class UserProfile(
     val documentId: String,
     val email: String,
     val name: String,
-    val phone: String,
+    val username: String,
     val role: String,
-    val status: String
+    val active: Boolean
 ) {
     val isActive: Boolean
-        get() = status.equals("ACTIVO", ignoreCase = true)
+        get() = active
+
+    val status: String
+        get() = if (active) "ACTIVO" else "INACTIVO"
 
     val displayName: String
         get() = if (name.isBlank()) email else name
@@ -39,6 +42,38 @@ data class ClientStayDetails(
     val stay: ActiveStay,
     val vehicle: VehicleInfo
 )
+
+data class EstanciaResumen(
+    val documentId: String,
+    val usuarioId: String,
+    val cajonId: String,
+    val estatus: String,
+    val fechaEntrada: Timestamp,
+    val fechaSalida: Timestamp?
+)
+
+data class SustentabilidadInfo(
+    val aguaCaptadaLitros: Double,
+    val aguaUsadaRiegoLitros: Double,
+    val energiaGeneradaKwh: Double,
+    val nivelTanquePorcentaje: Double,
+    val porcentajeSolar: Double,
+    val bombaAguaEncendida: Boolean,
+    val alertas: Map<String, Any?>
+)
+
+data class CajonInfo(
+    val documentId: String,
+    val nivel: Int,
+    val numeroCajon: Int,
+    val estado: String
+) {
+    val codigo: String
+        get() = "N${nivel}C$numeroCajon"
+
+    val isLibre: Boolean
+        get() = estado.equals("Libre", ignoreCase = true)
+}
 
 class UserProfileNotFoundException : Exception("No existe un perfil de usuario en Firestore para este correo.")
 
@@ -68,7 +103,8 @@ class FirebaseRepository(
     fun signIn(email: String, password: String, callback: (Result<UserProfile>) -> Unit) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener {
-                fetchUserProfileByEmail(email) { result ->
+                val resolvedEmail = auth.currentUser?.email ?: email
+                fetchUserProfileByEmail(resolvedEmail) { result ->
                     result.onSuccess { callback(Result.success(it)) }
                     result.onFailure { error ->
                         auth.signOut()
@@ -144,6 +180,81 @@ class FirebaseRepository(
             }
     }
 
+    fun fetchCajones(callback: (Result<List<CajonInfo>>) -> Unit) {
+        firestore.collection("cajones-dev")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val cajones = snapshot.documents
+                    .mapNotNull { it.toCajonInfo() }
+                    .sortedWith(compareBy({ it.nivel }, { it.numeroCajon }))
+
+                callback(Result.success(cajones))
+            }
+            .addOnFailureListener { error ->
+                callback(Result.failure(error))
+            }
+    }
+
+    fun fetchSustentabilidad(callback: (Result<SustentabilidadInfo?>) -> Unit) {
+        firestore.collection("sustentabilidad")
+            .document("actual")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                callback(Result.success(snapshot.toSustentabilidadInfo()))
+            }
+            .addOnFailureListener { error ->
+                callback(Result.failure(error))
+            }
+    }
+
+    fun fetchEstancias(callback: (Result<List<EstanciaResumen>>) -> Unit) {
+        firestore.collection("estancias")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                callback(Result.success(snapshot.documents.mapNotNull { it.toEstanciaResumen() }))
+            }
+            .addOnFailureListener { error ->
+                callback(Result.failure(error))
+            }
+    }
+
+    fun fetchCajonOccupancy(
+        cajonId: String,
+        callback: (Result<ClientStayDetails?>) -> Unit
+    ) {
+        firestore.collection("estancias")
+            .whereEqualTo("cajonId", cajonId)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val activeStayDocument = snapshot.documents.firstOrNull {
+                    it.getString("estatus").equals("ACTIVA", ignoreCase = true)
+                }
+
+                if (activeStayDocument == null) {
+                    callback(Result.success(null))
+                    return@addOnSuccessListener
+                }
+
+                val activeStay = activeStayDocument.toActiveStay()
+                if (activeStay == null) {
+                    callback(Result.failure(IllegalStateException("La estancia activa no tiene los campos requeridos.")))
+                    return@addOnSuccessListener
+                }
+
+                fetchVehicleByDocumentId(activeStay.vehicleId) { vehicleResult ->
+                    vehicleResult.onSuccess { vehicle ->
+                        callback(Result.success(ClientStayDetails(activeStay, vehicle)))
+                    }
+                    vehicleResult.onFailure { error ->
+                        callback(Result.failure(error))
+                    }
+                }
+            }
+            .addOnFailureListener { error ->
+                callback(Result.failure(error))
+            }
+    }
+
     fun fetchClientStayDetails(
         userDocumentId: String,
         callback: (Result<ClientStayDetails?>) -> Unit
@@ -185,8 +296,9 @@ class FirebaseRepository(
         email: String,
         callback: (Result<UserProfile>) -> Unit
     ) {
+        val normalizedEmail = email.trim().lowercase()
         firestore.collection("usuarios")
-            .whereEqualTo("email", email)
+            .whereEqualTo("email", normalizedEmail)
             .limit(1)
             .get()
             .addOnSuccessListener { snapshot ->
@@ -242,10 +354,15 @@ class FirebaseRepository(
         }
 
         val email = getString("email").orEmpty().trim()
-        val role = getString("rol").orEmpty().trim().uppercase()
-        val status = getString("estado").orEmpty().trim().uppercase()
+        val puesto = getString("puesto").orEmpty().trim()
+        val role = when {
+            puesto.equals("Administrador", ignoreCase = true) -> "ADMIN"
+            puesto.equals("Cliente", ignoreCase = true) -> "CLIENTE"
+            else -> puesto.uppercase()
+        }
+        val active = getBoolean("activo")
 
-        if (email.isBlank() || role.isBlank() || status.isBlank()) {
+        if (email.isBlank() || role.isBlank() || active == null) {
             return null
         }
 
@@ -253,9 +370,72 @@ class FirebaseRepository(
             documentId = id,
             email = email,
             name = getString("nombre").orEmpty().trim(),
-            phone = getString("telefono").orEmpty().trim(),
+            username = getString("usuario").orEmpty().trim(),
             role = role,
-            status = status
+            active = active
+        )
+    }
+
+    private fun DocumentSnapshot.toCajonInfo(): CajonInfo? {
+        if (!exists()) {
+            return null
+        }
+
+        val nivel = getLong("nivel")?.toInt()
+        val numeroCajon = getLong("numeroCajon")?.toInt()
+        val estado = getString("estado").orEmpty().trim()
+
+        if (nivel == null || numeroCajon == null || estado.isBlank()) {
+            return null
+        }
+
+        return CajonInfo(
+            documentId = id,
+            nivel = nivel,
+            numeroCajon = numeroCajon,
+            estado = estado
+        )
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun DocumentSnapshot.toSustentabilidadInfo(): SustentabilidadInfo? {
+        if (!exists()) {
+            return null
+        }
+
+        return SustentabilidadInfo(
+            aguaCaptadaLitros = getDouble("aguaCaptadaLitros") ?: 0.0,
+            aguaUsadaRiegoLitros = getDouble("aguaUsadaRiego") ?: 0.0,
+            energiaGeneradaKwh = getDouble("energiaGeneradaKwh") ?: 0.0,
+            nivelTanquePorcentaje = getDouble("nivelTanque") ?: 0.0,
+            porcentajeSolar = getDouble("porcentajeSolar") ?: 0.0,
+            bombaAguaEncendida = getBoolean("bombaAgua") ?: false,
+            alertas = (get("alertas") as? Map<String, Any?>) ?: emptyMap()
+        )
+    }
+
+    private fun DocumentSnapshot.toEstanciaResumen(): EstanciaResumen? {
+        if (!exists()) {
+            return null
+        }
+
+        val usuarioId = getString("usuarioId").orEmpty().trim()
+        val cajonId = getString("cajonId").orEmpty().trim()
+        val estatus = getString("estatus").orEmpty().trim().uppercase()
+        val fechaEntrada = getTimestamp("fechaEntrada")
+        val fechaSalida = getTimestamp("fechaSalida")
+
+        if (usuarioId.isBlank() || cajonId.isBlank() || estatus.isBlank() || fechaEntrada == null) {
+            return null
+        }
+
+        return EstanciaResumen(
+            documentId = id,
+            usuarioId = usuarioId,
+            cajonId = cajonId,
+            estatus = estatus,
+            fechaEntrada = fechaEntrada,
+            fechaSalida = fechaSalida
         )
     }
 

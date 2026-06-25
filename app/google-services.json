@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "258782929788",
-    "project_id": "kaax-park",
-    "storage_bucket": "kaax-park.firebasestorage.app"
+    "project_number": "1010499019027",
+    "project_id": "kaakpark",
+    "storage_bucket": "kaakpark.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:258782929788:android:b33fe3b6d5983bfdcafaf9",
+        "mobilesdk_app_id": "1:1010499019027:android:8d7ab84a4e6a59a489fae6",
         "android_client_info": {
           "package_name": "com.kaax.AppKaaxPark"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAs2M4TrYzMchEE81FSuiC4ZPQPwSSHSTU"
+          "current_key": "AIzaSyDGwITCmKZXFO_QmdHofWQo_hLttYIAg70"
         }
       ],
       "services": {

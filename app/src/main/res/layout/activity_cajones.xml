@@ -101,10 +101,11 @@
                     android:textColor="#B0B5B8"
                     android:textSize="12sp" />
                 <TextView
+                    android:id="@+id/txtTotalCajones"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/lblTotalTag"
-                    android:text="120"
+                    android:text="0"
                     android:textColor="#FFFFFF"
                     android:textSize="28sp"
                     android:textStyle="bold"/>
@@ -130,19 +131,21 @@
                     android:textColor="#B0B5B8"
                     android:textSize="12sp" />
                 <TextView
+                    android:id="@+id/txtOcupadosCajones"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/lblOcupadosTag"
-                    android:text="76"
+                    android:text="0"
                     android:textColor="#FFFFFF"
                     android:textSize="28sp"
                     android:textStyle="bold" />
                 <TextView
+                    android:id="@+id/txtOcupadosPorcentaje"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
-                    android:text="63%"
+                    android:text="0%"
                     android:textColor="#B0B5B8"
                     android:textSize="11sp" />
             </RelativeLayout>
@@ -167,19 +170,21 @@
                     android:textColor="#B0B5B8"
                     android:textSize="12sp" />
                 <TextView
+                    android:id="@+id/txtDisponiblesCajones"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/lblDisponiblesTag"
-                    android:text="44"
+                    android:text="0"
                     android:textColor="#FFFFFF"
                     android:textSize="28sp"
                     android:textStyle="bold"/>
                 <TextView
+                    android:id="@+id/txtDisponiblesPorcentaje"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
-                    android:text="37%"
+                    android:text="0%"
                     android:textColor="#B0B5B8"
                     android:textSize="11sp" />
             </RelativeLayout>
@@ -194,18 +199,26 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
+            android:id="@+id/layoutListaCajones"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="80dp">
 
-            <include layout="@layout/item_cajon"/>
-            <include layout="@layout/item_cajon"/>
-            <include layout="@layout/item_cajon"/>
-            <include layout="@layout/item_cajon"/>
-            <include layout="@layout/item_cajon"/>
-
         </LinearLayout>
     </ScrollView>
+
+    <TextView
+        android:id="@+id/lblSinCajones"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No se encontraron cajones."
+        android:textColor="#9E9E9E"
+        android:textSize="13sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/layoutContadores"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="40dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

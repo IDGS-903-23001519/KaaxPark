@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:padding="16dp"
     tools:context=".Admin.Reportes">
 
@@ -80,6 +85,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/txtPeriodoSeleccionado"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Últimos 7 días"
@@ -120,6 +126,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/lblRangoPeriodo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
@@ -159,6 +166,7 @@
                             android:layout_marginTop="12dp"
                             android:background="@drawable/circulo_progreso_dashboard" />
                         <TextView
+                            android:id="@+id/txtOcupacionPromedio"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_toEndOf="@id/graficodonaSimulado"
@@ -166,7 +174,7 @@
                             android:layout_alignBottom="@id/graficodonaSimulado"
                             android:layout_marginStart="6dp"
                             android:gravity="center_vertical"
-                            android:text="76%"
+                            android:text="0%"
                             android:textColor="#FFFFFF"
                             android:textSize="18sp" />
                     </RelativeLayout>
@@ -191,10 +199,11 @@
                             android:textColor="#A0A0A0"
                             android:textSize="10sp" />
                         <TextView
+                            android:id="@+id/txtTiempoPromedioReporte"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="14dp"
-                            android:text="03:18:45"
+                            android:text="--:--:--"
                             android:textColor="#FFFFFF"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -220,10 +229,11 @@
                             android:textColor="#A0A0A0"
                             android:textSize="10sp" />
                         <TextView
+                            android:id="@+id/txtUsuariosActivos"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="14dp"
-                            android:text="128"
+                            android:text="0"
                             android:textColor="#FFFFFF"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -253,13 +263,11 @@
         android:background="#0D0D0D"
         app:layout_constraintTop_toBottomOf="@id/lblTendenciaTitulo">
 
-        <ImageView
-            android:id="@+id/imgGraficaSimulada"
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chartTendencia"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY"
-            android:src="@drawable/bg_grafica_lineal_mockup"
-            tools:ignore="ContentDescription" />
+            android:padding="6dp" />
     </FrameLayout>
 
     <LinearLayout
@@ -267,12 +275,14 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
         android:background="@drawable/bg_boton_generar"
         android:gravity="center"
         android:orientation="horizontal"
         android:clickable="true"
         android:focusable="true"
         app:layout_constraintTop_toBottomOf="@id/containerGraficaLineal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -293,3 +303,4 @@
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

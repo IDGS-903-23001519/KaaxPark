@@ -26,7 +26,7 @@ class InfoUsuario : AppCompatActivity() {
     private lateinit var txtRol: TextView
     private lateinit var txtEstado: TextView
     private lateinit var txtEmail: TextView
-    private lateinit var txtTelefono: TextView
+    private lateinit var txtUsuario: TextView
     private lateinit var txtMarcaModelo: TextView
     private lateinit var txtPlaca: TextView
     private lateinit var txtColor: TextView
@@ -49,7 +49,7 @@ class InfoUsuario : AppCompatActivity() {
         txtNombre = findViewById(R.id.txtNombre)
         txtEstado = findViewById(R.id.txtEstado)
         txtEmail = findViewById(R.id.txtEmail)
-        txtTelefono = findViewById(R.id.txtTelefono)
+        txtUsuario = findViewById(R.id.txtUsuario)
 
         txtMarcaModelo = findViewById(R.id.txtMarcaModelo)
         txtPlaca = findViewById(R.id.txtPlaca)
@@ -103,7 +103,7 @@ class InfoUsuario : AppCompatActivity() {
                     txtRol.text = usuario.role
                     txtEstado.text = usuario.status
                     txtEmail.text = usuario.email
-                    txtTelefono.text = usuario.phone
+                    txtUsuario.text = usuario.username
 
                     if (usuario.role.equals("CLIENTE", true)) {
 
