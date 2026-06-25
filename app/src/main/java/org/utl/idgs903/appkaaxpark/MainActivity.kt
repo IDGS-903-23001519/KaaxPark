@@ -7,6 +7,7 @@ import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -18,13 +19,14 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import org.utl.idgs903.appkaaxpark.Admin.Dashboard
-import org.utl.idgs903.appkaaxpark.Cliente.EstanciaVehiculo
+import org.utl.idgs903.appkaaxpark.Cliente.RegistrarCliente
 import org.utl.idgs903.appkaaxpark.data.FirebaseRepository
 import org.utl.idgs903.appkaaxpark.data.InactiveUserException
 import org.utl.idgs903.appkaaxpark.data.SessionManager
 import org.utl.idgs903.appkaaxpark.data.UnsupportedRoleException
 import org.utl.idgs903.appkaaxpark.data.UserProfile
 import org.utl.idgs903.appkaaxpark.data.UserProfileNotFoundException
+import org.utl.idgs903.appkaaxpark.Cliente.Codigoqr
 
 class MainActivity : AppCompatActivity() {
 
@@ -72,6 +74,12 @@ class MainActivity : AppCompatActivity() {
         btnLogin.setOnClickListener {
             signIn()
         }
+
+        val txtRegistro = findViewById<TextView>(R.id.txtRegistro)
+        txtRegistro.setOnClickListener {
+            val intent = Intent(this, RegistrarCliente::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onStart() {
@@ -86,7 +94,6 @@ class MainActivity : AppCompatActivity() {
             }
             return
         }
-
         setLoadingState(isLoading = true, loadingLabel = "Restaurando...")
         repository.restoreUserProfile(sessionManager.getSession()) { result ->
             setLoadingState(isLoading = false)
@@ -109,6 +116,7 @@ class MainActivity : AppCompatActivity() {
     private fun signIn() {
         val email = txtUsuario.text.toString().trim()
         val password = txtPassword.text.toString()
+
 
         txtUsuario.error = null
         txtPassword.error = null
@@ -148,7 +156,7 @@ class MainActivity : AppCompatActivity() {
     private fun navigateToRoleHome(profile: UserProfile) {
         val destination = when {
             profile.role.equals("ADMIN", ignoreCase = true) -> Dashboard::class.java
-            profile.role.equals("CLIENTE", ignoreCase = true) -> EstanciaVehiculo::class.java
+            profile.role.equals("CLIENTE", ignoreCase = true) -> Codigoqr::class.java
             else -> {
                 repository.signOut()
                 sessionManager.clearSession()
@@ -187,4 +195,6 @@ class MainActivity : AppCompatActivity() {
 
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
+
+
 }

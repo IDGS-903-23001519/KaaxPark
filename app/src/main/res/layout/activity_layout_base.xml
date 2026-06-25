@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_base"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -28,6 +29,31 @@
         android:focusable="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Nuevo botón: acceso a "Mis vehículos" (agregar / seleccionar vehículo en uso) -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btnVehiculos"
+        android:layout_width="50dp"
+        android:layout_height="58dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardBackgroundColor="#1A1A1A"
+        app:cardCornerRadius="22dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imgBtnVehiculos"
+            android:layout_width="32dp"
+            android:layout_height="31dp"
+            android:layout_gravity="center"
+            android:contentDescription="Mis vehículos"
+            android:src="@drawable/icon_vehiculo"
+            app:tint="#D4A017" />
+    </androidx.cardview.widget.CardView>
 
 
     <LinearLayout

@@ -25,6 +25,8 @@ class EstanciaVehiculo : BaseActivity() {
     private lateinit var txtDetallePlaca: TextView
     private lateinit var txtDetalleColor: TextView
 
+    private lateinit var txtDetalleLugar: TextView
+
     private val timerHandler = Handler(Looper.getMainLooper())
     private var entryTimeMillis: Long? = null
 
@@ -54,6 +56,7 @@ class EstanciaVehiculo : BaseActivity() {
         txtDetalleMarca = findViewById(R.id.txtDetalleMarca)
         txtDetallePlaca = findViewById(R.id.txtDetallePlaca)
         txtDetalleColor = findViewById(R.id.txtDetalleColor)
+        txtDetalleLugar = findViewById(R.id.txtDetalleLugar)
 
         val btnActualizar = findViewById<LinearLayout>(R.id.btnActualizar)
         btnActualizar?.setOnClickListener {
@@ -131,6 +134,7 @@ class EstanciaVehiculo : BaseActivity() {
         txtDetalleMarca.text = details.vehicle.brand
         txtDetallePlaca.text = details.vehicle.plate
         txtDetalleColor.text = details.vehicle.color
+        txtDetalleLugar.text = details.stay.assignedSpotId.ifBlank { "--" }
         entryTimeMillis = details.stay.entryTimestamp.toDate().time
         startTimer()
     }
@@ -140,6 +144,7 @@ class EstanciaVehiculo : BaseActivity() {
         txtDetalleMarca.text = "--"
         txtDetallePlaca.text = "--"
         txtDetalleColor.text = "--"
+        txtDetalleLugar.text = "--"
         entryTimeMillis = null
         stopTimer()
         txtTiempoMarcador.text = "--:--:--"

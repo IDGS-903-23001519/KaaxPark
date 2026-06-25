@@ -16,7 +16,7 @@
         android:textColor="#FFFFFF"
         android:textSize="22sp"
         android:textStyle="italic"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="68dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="25dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="25dp"
         android:layout_marginEnd="25dp"
         android:background="@drawable/border_detalle"
         android:orientation="vertical"
@@ -46,10 +46,11 @@
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
             <TextView
+                android:id="@+id/txtTiempoTotalValor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:text="02:45:18"
+                android:text="00:00:00"
                 android:textColor="#E5A93C"
                 android:textSize="16sp" />
         </RelativeLayout>
@@ -69,6 +70,7 @@
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
             <TextView
+                android:id="@+id/txtTarifaValor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -92,10 +94,11 @@
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
             <TextView
+                android:id="@+id/txtSubtotalValor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:text="$825.00"
+                android:text="$0.00"
                 android:textColor="#E5A93C"
                 android:textSize="16sp" />
         </RelativeLayout>
@@ -115,10 +118,11 @@
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
             <TextView
+                android:id="@+id/txtIvaValor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:text="$132.00"
+                android:text="$0.00"
                 android:textColor="#E5A93C"
                 android:textSize="16sp" />
         </RelativeLayout>
@@ -138,10 +142,11 @@
                 android:textColor="#FFFFFF"
                 android:textSize="17sp" />
             <TextView
+                android:id="@+id/txtTotalValor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:text="$957.00"
+                android:text="$0.00"
                 android:textColor="#E5A93C"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -152,8 +157,9 @@
         android:id="@+id/txtAviso"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="El pago se realizara al momento\nde la salida."
+        android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="30dp"
+        android:text="El pago se realizará al momento\nde la salida."
         android:textColor="#BBBBBB"
         android:textSize="18sp"
         android:textStyle="italic"
@@ -168,7 +174,7 @@
         android:layout_height="55dp"
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/border_boton_pagar"
         android:orientation="horizontal"
         android:gravity="center"
@@ -183,6 +189,7 @@
             android:src="@drawable/icon_vehiculo_pago" />
 
         <TextView
+            android:id="@+id/txtBtnPagar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Pagar y recuperar"
