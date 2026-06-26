@@ -11,6 +11,7 @@ data class UserProfile(
     val email: String,
     val name: String,
     val username: String,
+    val phone: String,
     val role: String,
     val active: Boolean
 ) {
@@ -178,26 +179,30 @@ class FirebaseRepository(
         documentId: String,
         callback: (Result<UserProfile>) -> Unit
     ) {
-        firestore.collection("usuariosc")
+        firestore.collection("usuarios")
             .document(documentId)
             .get()
             .addOnSuccessListener { snapshot ->
                 val profile = snapshot.toUserProfile()
-                if (profile == null) {
-                    callback(Result.failure(UserProfileNotFoundException()))
+                if (profile != null) {
+                    resolveProfileResult(profile, callback)
                     return@addOnSuccessListener
                 }
-                if (!profile.isActive) {
-                    callback(Result.failure(InactiveUserException()))
-                    return@addOnSuccessListener
-                }
-                if (!profile.role.equals("ADMIN", ignoreCase = true)
-                    && !profile.role.equals("CLIENTE", ignoreCase = true)
-                ) {
-                    callback(Result.failure(UnsupportedRoleException(profile.role)))
-                    return@addOnSuccessListener
-                }
-                callback(Result.success(profile))
+
+                firestore.collection("usuariosc")
+                    .document(documentId)
+                    .get()
+                    .addOnSuccessListener { clientSnapshot ->
+                        val clientProfile = clientSnapshot.toUserProfile()
+                        if (clientProfile == null) {
+                            callback(Result.failure(UserProfileNotFoundException()))
+                            return@addOnSuccessListener
+                        }
+                        resolveProfileResult(clientProfile, callback)
+                    }
+                    .addOnFailureListener { error ->
+                        callback(Result.failure(error))
+                    }
             }
             .addOnFailureListener { error ->
                 callback(Result.failure(error))
@@ -611,25 +616,47 @@ class FirebaseRepository(
             .get()
             .addOnSuccessListener { snapshot ->
                 val profile = snapshot.documents.firstOrNull()?.toUserProfile()
-                if (profile == null) {
-                    callback(Result.failure(UserProfileNotFoundException()))
+                if (profile != null) {
+                    resolveProfileResult(profile, callback)
                     return@addOnSuccessListener
                 }
-                if (!profile.isActive) {
-                    callback(Result.failure(InactiveUserException()))
-                    return@addOnSuccessListener
-                }
-                if (!profile.role.equals("ADMIN", ignoreCase = true)
-                    && !profile.role.equals("CLIENTE", ignoreCase = true)
-                ) {
-                    callback(Result.failure(UnsupportedRoleException(profile.role)))
-                    return@addOnSuccessListener
-                }
-                callback(Result.success(profile))
+
+                firestore.collection("usuariosc")
+                    .whereEqualTo("email", email)
+                    .limit(1)
+                    .get()
+                    .addOnSuccessListener { clientSnapshot ->
+                        val clientProfile = clientSnapshot.documents.firstOrNull()?.toUserProfile()
+                        if (clientProfile == null) {
+                            callback(Result.failure(UserProfileNotFoundException()))
+                            return@addOnSuccessListener
+                        }
+                        resolveProfileResult(clientProfile, callback)
+                    }
+                    .addOnFailureListener { error ->
+                        callback(Result.failure(error))
+                    }
             }
             .addOnFailureListener { error ->
                 callback(Result.failure(error))
             }
+    }
+
+    private fun resolveProfileResult(
+        profile: UserProfile,
+        callback: (Result<UserProfile>) -> Unit
+    ) {
+        if (!profile.isActive) {
+            callback(Result.failure(InactiveUserException()))
+            return
+        }
+        if (!profile.role.equals("ADMIN", ignoreCase = true)
+            && !profile.role.equals("CLIENTE", ignoreCase = true)
+        ) {
+            callback(Result.failure(UnsupportedRoleException(profile.role)))
+            return
+        }
+        callback(Result.success(profile))
     }
 
     private fun fetchVehicleByDocumentId(
@@ -759,14 +786,24 @@ class FirebaseRepository(
 
         val email = getString("email").orEmpty().trim()
         val puesto = getString("puesto").orEmpty().trim()
+        val rol = getString("rol").orEmpty().trim()
         val role = when {
             puesto.equals("Administrador", ignoreCase = true) -> "ADMIN"
             puesto.equals("Cliente", ignoreCase = true) -> "CLIENTE"
-            else -> puesto.uppercase()
+            rol.isNotBlank() -> rol.uppercase()
+            puesto.isNotBlank() -> puesto.uppercase()
+            else -> ""
         }
-        val active = getBoolean("activo")
 
-        if (email.isBlank() || role.isBlank() || status.isBlank()) {
+        val activoBooleano = getBoolean("activo")
+        val estadoTexto = getString("estado").orEmpty().trim()
+        val active = when {
+            activoBooleano != null -> activoBooleano
+            estadoTexto.isNotBlank() -> estadoTexto.equals("ACTIVO", ignoreCase = true)
+            else -> false
+        }
+
+        if (email.isBlank() || role.isBlank()) {
             return null
         }
 
@@ -775,6 +812,7 @@ class FirebaseRepository(
             email = email,
             name = getString("nombre").orEmpty().trim(),
             username = getString("usuario").orEmpty().trim(),
+            phone = getString("telefono").orEmpty().trim(),
             role = role,
             active = active
         )

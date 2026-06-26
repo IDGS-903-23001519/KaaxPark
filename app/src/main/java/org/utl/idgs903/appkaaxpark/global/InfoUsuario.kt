@@ -26,7 +26,8 @@ class InfoUsuario : AppCompatActivity() {
     private lateinit var txtRol: TextView
     private lateinit var txtEstado: TextView
     private lateinit var txtEmail: TextView
-    private lateinit var txtUsuario: TextView
+    private lateinit var lblCampoSecundario: TextView
+    private lateinit var txtCampoSecundario: TextView
     private lateinit var txtMarcaModelo: TextView
     private lateinit var txtPlaca: TextView
     private lateinit var txtColor: TextView
@@ -49,7 +50,8 @@ class InfoUsuario : AppCompatActivity() {
         txtNombre = findViewById(R.id.txtNombre)
         txtEstado = findViewById(R.id.txtEstado)
         txtEmail = findViewById(R.id.txtEmail)
-        txtUsuario = findViewById(R.id.txtUsuario)
+        lblCampoSecundario = findViewById(R.id.lblCampoSecundario)
+        txtCampoSecundario = findViewById(R.id.txtCampoSecundario)
 
         txtMarcaModelo = findViewById(R.id.txtMarcaModelo)
         txtPlaca = findViewById(R.id.txtPlaca)
@@ -103,7 +105,14 @@ class InfoUsuario : AppCompatActivity() {
                     txtRol.text = usuario.role
                     txtEstado.text = usuario.status
                     txtEmail.text = usuario.email
-                    txtUsuario.text = usuario.username
+
+                    if (usuario.role.equals("ADMIN", true)) {
+                        lblCampoSecundario.text = "Usuario"
+                        txtCampoSecundario.text = usuario.username
+                    } else {
+                        lblCampoSecundario.text = "Teléfono"
+                        txtCampoSecundario.text = usuario.phone
+                    }
 
                     if (usuario.role.equals("CLIENTE", true)) {
 
