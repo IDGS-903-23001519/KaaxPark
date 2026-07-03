@@ -5,6 +5,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data class UserProfile(
     val documentId: String,
@@ -113,6 +116,10 @@ class VehiculoNoEncontradoException : Exception("No se encontró un vehículo en
 
 class EstanciaActivaExistenteException : Exception("Ya tienes una estancia activa.")
 
+class SinCajonesDisponiblesException : Exception("No hay cajones disponibles en este momento. Intenta más tarde.")
+
+
+
 class FirebaseRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -126,6 +133,77 @@ class FirebaseRepository(
 
     fun signOut() {
         auth.signOut()
+    }
+
+    /**
+     * Igual que assignParkingSpot, pero en vez de recibir un cajón ya
+     * elegido (por código QR específico), elige uno al azar entre los
+     * que estén "Libre". Si dos clientes escanean casi al mismo tiempo y
+     * "chocan" por el mismo cajón, reintenta automáticamente con otro
+     * candidato — el cliente nunca ve ese choque, solo el resultado final.
+     */
+    fun assignRandomParkingSpot(
+        usuarioId: String,
+        vehiculoId: String,
+        callback: (Result<String>) -> Unit
+    ) {
+        firestore.collection("estancias")
+            .whereEqualTo("usuarioId", usuarioId)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val yaTieneActiva = snapshot.documents.any {
+                    it.getString("estatus").equals("ACTIVA", ignoreCase = true)
+                }
+                if (yaTieneActiva) {
+                    callback(Result.failure(EstanciaActivaExistenteException()))
+                    return@addOnSuccessListener
+                }
+
+                firestore.collection("cajones-dev")
+                    .whereEqualTo("estado", "Libre")
+                    .get()
+                    .addOnSuccessListener { cajonesSnap ->
+                        // Nivel 4 no es operativo (tampoco aparece en la página de
+                        // administración de cajones), así que se excluye del sorteo.
+                        val candidatos = cajonesSnap.documents
+                            .filter { (it.getLong("nivel") ?: 0L) != 4L }
+                            .map { it.id }
+                            .shuffled()
+
+                        if (candidatos.isEmpty()) {
+                            callback(Result.failure(SinCajonesDisponiblesException()))
+                            return@addOnSuccessListener
+                        }
+                        intentarAsignarCandidato(usuarioId, vehiculoId, candidatos, 0, callback)
+                    }
+                    .addOnFailureListener { error -> callback(Result.failure(error)) }
+            }
+            .addOnFailureListener { error -> callback(Result.failure(error)) }
+    }
+
+    private fun intentarAsignarCandidato(
+        usuarioId: String,
+        vehiculoId: String,
+        candidatos: List<String>,
+        indice: Int,
+        callback: (Result<String>) -> Unit
+    ) {
+        if (indice >= candidatos.size) {
+            callback(Result.failure(SinCajonesDisponiblesException()))
+            return
+        }
+
+        runAssignmentTransaction(usuarioId, vehiculoId, candidatos[indice]) { result ->
+            result.onSuccess { callback(Result.success(it)) }
+            result.onFailure { error ->
+                if (error is CajonOcupadoException) {
+                    // Otro cliente lo tomó justo antes — probamos el siguiente candidato.
+                    intentarAsignarCandidato(usuarioId, vehiculoId, candidatos, indice + 1, callback)
+                } else {
+                    callback(Result.failure(error))
+                }
+            }
+        }
     }
 
     fun signIn(email: String, password: String, callback: (Result<UserProfile>) -> Unit) {
@@ -222,6 +300,46 @@ class FirebaseRepository(
             .addOnFailureListener { error ->
                 callback(Result.failure(error))
             }
+    }
+
+    fun fetchSecuenciaIdsDeCajon(
+        cajonId: String,
+        callback: (Result<Pair<String?, String?>>) -> Unit
+    ) {
+        firestore.collection("cajones-dev")
+            .document(cajonId)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val ingreso = snapshot.getString("secuenciaIngresoId")?.takeIf { it.isNotBlank() }
+                val salida = snapshot.getString("secuenciaSalidaId")?.takeIf { it.isNotBlank() }
+                callback(Result.success(ingreso to salida))
+            }
+            .addOnFailureListener { error -> callback(Result.failure(error)) }
+    }
+
+    /**
+     * Trae los pasos (motores/tiempos) de una secuencia guardada en la
+     * colección 'secuencias' — la misma colección que ya usa la página web.
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun fetchPasosDeSecuencia(
+        secuenciaId: String,
+        callback: (Result<List<Map<String, Any>>>) -> Unit
+    ) {
+        firestore.collection("secuencias")
+            .document(secuenciaId)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (!snapshot.exists()) {
+                    callback(Result.failure(Exception("La secuencia ya no existe.")))
+                    return@addOnSuccessListener
+                }
+                val pasos = (snapshot.get("pasos") as? List<*>)
+                    ?.mapNotNull { it as? Map<String, Any> }
+                    ?: emptyList()
+                callback(Result.success(pasos))
+            }
+            .addOnFailureListener { error -> callback(Result.failure(error)) }
     }
 
     fun fetchSustentabilidad(callback: (Result<SustentabilidadInfo?>) -> Unit) {
@@ -947,5 +1065,89 @@ class FirebaseRepository(
             color = color,
             isActive = isActive
         )
+    }
+
+    // ─── TARIFA ─────────────────────────────────────────────────────────────────
+    /**
+     * Lee la tarifa por hora desde el mismo documento que usa la página web.
+     * Si no existe el documento, devuelve 60.0 como valor por defecto.
+     * Ajusta 'configuracion/tarifa' si tu web usa otra ruta en getTarifa().
+     */
+    fun fetchTarifaPorHora(callback: (Result<Double>) -> Unit) {
+        firestore.collection("configuracion").document("tarifa")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val tarifa = snapshot.getDouble("tarifaPorHora") ?: 60.0
+                callback(Result.success(tarifa))
+            }
+            .addOnFailureListener { callback(Result.success(60.0)) }
+    }
+
+// ─── PAGOS ──────────────────────────────────────────────────────────────────
+    /**
+     * Crea un registro en la colección 'pagos' (la misma que lee la página web).
+     *
+     *  estado = "Completado"   → pago con tarjeta: ya confirmado automáticamente.
+     *  estado = "PendienteCaja" → pago en ventanilla: espera que el admin confirme.
+     *
+     * Devuelve el ID del documento creado. Para pagos en caja, el app escucha
+     * ese ID con [listenPagoEstado] para detectar la confirmación del admin.
+     */
+    fun addPagoMovil(
+        folio: String,
+        cajonId: String,
+        cajonDescripcion: String,
+        placa: String,
+        horaEntrada: String,
+        horaSalida: String,
+        duracionMin: Long,
+        monto: Double,
+        metodo: String,
+        estado: String,
+        estanciaId: String,
+        callback: (Result<String>) -> Unit
+    ) {
+        val fecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val datos = hashMapOf(
+            "folio"           to folio,
+            "cajonId"         to cajonId,
+            "cajonDescripcion" to cajonDescripcion,
+            "placa"           to placa,
+            "horaEntrada"     to horaEntrada,
+            "horaSalida"      to horaSalida,
+            "duracionMin"     to duracionMin,
+            "monto"           to monto,
+            "metodo"          to metodo,
+            "estado"          to estado,
+            "estanciaId"      to estanciaId, // necesario para que el web finalice la estancia
+            "fecha"           to fecha,
+            "timestamp"       to System.currentTimeMillis(),
+            "pagadoPorApp"    to true
+        )
+        firestore.collection("pagos").add(datos)
+            .addOnSuccessListener { ref -> callback(Result.success(ref.id)) }
+            .addOnFailureListener { error -> callback(Result.failure(error)) }
+    }
+
+    /**
+     * Escucha en tiempo real el campo 'estado' del documento de un pago.
+     * Úsalo después de crear un PendienteCaja para detectar cuando el admin
+     * confirma el pago desde la página web.
+     *
+     * Devuelve una función lambda que cancela el listener — llámala en onDestroy.
+     *
+     *  cancelar = repository.listenPagoEstado(pagoId) { estado ->
+     *      if (estado == "Completado") { ... }
+     *  }
+     *  // later:
+     *  cancelar()
+     */
+    fun listenPagoEstado(pagoId: String, onCambio: (String) -> Unit): () -> Unit {
+        val registration = firestore.collection("pagos").document(pagoId)
+            .addSnapshotListener { snapshot, _ ->
+                val estado = snapshot?.getString("estado") ?: return@addSnapshotListener
+                onCambio(estado)
+            }
+        return { registration.remove() }
     }
 }

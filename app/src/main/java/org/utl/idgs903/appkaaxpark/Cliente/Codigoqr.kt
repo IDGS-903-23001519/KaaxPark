@@ -13,11 +13,11 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import org.utl.idgs903.appkaaxpark.R
-import org.utl.idgs903.appkaaxpark.data.CajonNoEncontradoException
-import org.utl.idgs903.appkaaxpark.data.CajonOcupadoException
+import org.utl.idgs903.appkaaxpark.data.CajonMotorHelper
 import org.utl.idgs903.appkaaxpark.data.EstanciaActivaExistenteException
 import org.utl.idgs903.appkaaxpark.data.FirebaseRepository
 import org.utl.idgs903.appkaaxpark.data.SessionManager
+import org.utl.idgs903.appkaaxpark.data.SinCajonesDisponiblesException
 import org.utl.idgs903.appkaaxpark.data.VehicleInfo
 import org.utl.idgs903.appkaaxpark.data.VehiculoNoEncontradoException
 
@@ -35,10 +35,10 @@ class Codigoqr : BaseActivity() {
     private var procesandoAsignacion = false
     private var vehiculos: List<VehicleInfo> = emptyList()
 
-    // Código del cajón leído por el escáner. Mientras sea null, no se puede
-    // elegir ningún vehículo (no se debe poder seleccionar coche sin haber
-    // escaneado primero el código QR de la entrada).
-    private var codigoCajonEscaneado: String? = null
+    // Ya no se guarda un código de cajón: el QR es uno solo, fijo en la
+    // entrada del estacionamiento. Esta bandera solo confirma que se
+    // escaneó ese QR antes de permitir elegir vehículo.
+    private var codigoEntradaValidado = false
 
     private enum class EstadoPantalla { ESCANEO, SELECCION_VEHICULO, ESTANCIA_ACTIVA }
 
@@ -48,6 +48,14 @@ class Codigoqr : BaseActivity() {
             .enableAutoZoom()
             .build()
         GmsBarcodeScanning.getClient(this, options)
+    }
+
+    companion object {
+        // El texto que debe traer el código QR físico colocado en la
+        // entrada del estacionamiento (uno solo para todo el lugar, ya
+        // no uno distinto por cajón). Debe coincidir EXACTO con el QR
+        // impreso — si cambias este valor, hay que reimprimir el QR.
+        private const val CODIGO_QR_ENTRADA = "KAAXPARK_INGRESO"
     }
 
     override fun getLayoutId(): Int = R.layout.activity_codigoqr
@@ -88,7 +96,7 @@ class Codigoqr : BaseActivity() {
     }
 
     private fun volverAEscanear() {
-        codigoCajonEscaneado = null
+        codigoEntradaValidado = false
         txtResultadoAsignacion.text = ""
         mostrarEstado(EstadoPantalla.ESCANEO)
     }
@@ -172,7 +180,7 @@ class Codigoqr : BaseActivity() {
         }
     }
 
-    // --- Paso 1: escaneo del código QR ---
+    // --- Paso 1: escaneo del código QR de la entrada ---
 
     private fun iniciarEscaneo() {
         scanner.startScan()
@@ -182,7 +190,15 @@ class Codigoqr : BaseActivity() {
                     Toast.makeText(this, "No se pudo leer el código QR.", Toast.LENGTH_SHORT).show()
                     return@addOnSuccessListener
                 }
-                codigoCajonEscaneado = valorQr
+                if (!valorQr.equals(CODIGO_QR_ENTRADA, ignoreCase = true)) {
+                    Toast.makeText(
+                        this,
+                        "Ese código QR no corresponde a la entrada del estacionamiento.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return@addOnSuccessListener
+                }
+                codigoEntradaValidado = true
                 txtResultadoAsignacion.text = ""
                 mostrarEstado(EstadoPantalla.SELECCION_VEHICULO)
             }
@@ -191,15 +207,14 @@ class Codigoqr : BaseActivity() {
             }
     }
 
-    // --- Paso 2: elegir con qué vehículo se entra ---
+    // --- Paso 2: elegir con qué vehículo se entra (el cajón se asigna al azar) ---
 
     private fun seleccionarVehiculoYAsignar(vehiculo: VehicleInfo) {
         if (procesandoAsignacion) return
 
-        val codigoCajon = codigoCajonEscaneado
-        if (codigoCajon == null) {
+        if (!codigoEntradaValidado) {
             // Salvaguarda: nunca debería pasar porque el contenedor de
-            // selección solo es visible después de un escaneo exitoso.
+            // selección solo es visible después de un escaneo válido.
             Toast.makeText(this, "Primero escanea el código QR.", Toast.LENGTH_SHORT).show()
             mostrarEstado(EstadoPantalla.ESCANEO)
             return
@@ -213,7 +228,7 @@ class Codigoqr : BaseActivity() {
 
         procesandoAsignacion = true
         renderizarVehiculos()
-        txtResultadoAsignacion.text = "Registrando tu ingreso..."
+        txtResultadoAsignacion.text = "Buscando un cajón disponible..."
 
         repository.setActiveVehicle(session.userDocId, vehiculo.documentId) { resultActivo ->
             if (resultActivo.isFailure) {
@@ -227,7 +242,7 @@ class Codigoqr : BaseActivity() {
                 return@setActiveVehicle
             }
 
-            repository.assignParkingSpot(session.userDocId, codigoCajon, vehiculo.documentId) { result ->
+            repository.assignRandomParkingSpot(session.userDocId, vehiculo.documentId) { result ->
                 procesandoAsignacion = false
 
                 result.onSuccess { lugarAsignado ->
@@ -238,6 +253,21 @@ class Codigoqr : BaseActivity() {
                         "¡Listo! Tu vehículo quedó registrado en el lugar $lugarAsignado.",
                         Toast.LENGTH_LONG
                     ).show()
+
+                    // Activa el mecanismo físico del cajón asignado. No bloquea
+                    // la navegación: el cajón ya quedó asignado en Firebase de
+                    // cualquier forma; si el robot no responde, solo avisamos.
+                    val contexto = applicationContext
+                    CajonMotorHelper.activarIngreso(repository, lugarAsignado) { motorResult ->
+                        motorResult.onFailure { error ->
+                            Toast.makeText(
+                                contexto,
+                                "Aviso: ${CajonMotorHelper.mensajeAmigable(error)} Avisa a un encargado.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+
                     irAEstancia()
                 }
 
@@ -281,8 +311,7 @@ class Codigoqr : BaseActivity() {
 
     private fun mostrarErrorAsignacion(error: Throwable) {
         val mensaje = when (error) {
-            is CajonNoEncontradoException -> "Ese código QR no corresponde a ningún cajón."
-            is CajonOcupadoException -> "Ese cajón ya está ocupado. Escanea otro código."
+            is SinCajonesDisponiblesException -> "No hay cajones disponibles en este momento. Intenta más tarde."
             is VehiculoNoEncontradoException -> "No se encontró un vehículo registrado en tu cuenta."
             is EstanciaActivaExistenteException -> {
                 verificarEstanciaExistente()
