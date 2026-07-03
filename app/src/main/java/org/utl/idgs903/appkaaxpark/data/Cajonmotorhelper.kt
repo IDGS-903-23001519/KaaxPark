@@ -1,15 +1,13 @@
 package org.utl.idgs903.appkaaxpark.data
 
 /**
- * Une los 3 pasos necesarios para mover los motores de un cajón en
- * particular:
- *   1) saber qué secuencia tiene vinculada (ingreso o salida)
- *   2) traer sus pasos desde Firestore (colección 'secuencias',
- *      la misma que administra la página web)
- *   3) mandarlos al ESP32 por MQTT
+ * Une los 3 pasos necesarios para mover los motores de un cajón:
+ *   1) obtener qué secuencia tiene vinculada (ingreso o salida) en Firestore
+ *   2) traer los pasos de esa secuencia (colección 'secuencias')
+ *   3) mandar los pasos al ESP32 por MQTT
  *
- * Pensado para llamarse desde Codigoqr (ingreso) y RecuperarVehiculo
- * (salida) sin repetir esta lógica en cada uno.
+ * El cliente MQTT que se use (local o en línea) lo decide [AppConfig].
+ * Para cambiar de versión solo hay que editar UNA línea en AppConfig.kt.
  */
 object CajonMotorHelper {
 
@@ -48,15 +46,25 @@ object CajonMotorHelper {
                             callback(Result.failure(Exception("La secuencia asignada no tiene pasos.")))
                             return@onSuccess
                         }
-                        MotorMqttClient.obtener().ejecutarPasos(pasos, callback)
+
+                        // ── Seleccionar cliente según el modo configurado ──────
+                        when (AppConfig.modoConexion) {
+                            ModoConexion.LOCAL  -> MotorMqttClient.obtener()
+                                .ejecutarPasos(pasos, callback)
+                            ModoConexion.ONLINE -> MotorMqttClientOnline.obtener()
+                                .ejecutarPasos(pasos, callback)
+                        }
                     }
                 }
             }
         }
     }
 
-    /** Mismo mensaje "ocupado" que ya usa la página web cuando el robot rechaza por estar en curso otra acción. */
+    /** Mensaje legible para el usuario cuando el ESP32 rechaza o no responde. */
     fun mensajeAmigable(error: Throwable): String =
-        if (error.message == "ocupado") "El robot está ocupado con otra acción, espera un momento."
-        else error.message ?: "No se pudo mover el mecanismo."
+        when (error.message) {
+            "ocupado"               -> "El robot está ocupado con otra acción, espera un momento."
+            "sin respuesta del robot" -> "El robot no respondió. Verifica que esté encendido y conectado."
+            else                    -> error.message ?: "No se pudo mover el mecanismo."
+        }
 }

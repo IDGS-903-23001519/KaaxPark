@@ -118,7 +118,12 @@ class EstanciaActivaExistenteException : Exception("Ya tienes una estancia activ
 
 class SinCajonesDisponiblesException : Exception("No hay cajones disponibles en este momento. Intenta más tarde.")
 
-
+data class ActividadDashboardItem(
+    val tipo: String,
+    val hora: String,
+    val placa: String,
+    val duracionMin: Int?
+)
 
 class FirebaseRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
@@ -1149,5 +1154,76 @@ class FirebaseRepository(
                 onCambio(estado)
             }
         return { registration.remove() }
+    }
+
+    // ─── DASHBOARD ───────────────────────────────────────────────────────────────
+
+    /**
+     * Listener en tiempo real de cajones.
+     * Equivale al getCajones() Observable que usa el web DashboardComponent.
+     * Devuelve una lambda para cancelar el listener — llámala en onDestroy.
+     */
+    fun listenCajones(onUpdate: (List<CajonInfo>) -> Unit): () -> Unit {
+        val reg = firestore.collection("cajones-dev")
+            .addSnapshotListener { snap, _ ->
+                if (snap == null) return@addSnapshotListener
+                val list = snap.documents.mapNotNull { it.toCajonInfo() }
+                    .sortedWith(compareBy({ it.nivel }, { it.numeroCajon }))
+                onUpdate(list)
+            }
+        return { reg.remove() }
+    }
+
+    /**
+     * Listener de toda la actividad del día indicado (YYYY-MM-DD).
+     * Equivale al getActividadPorFecha(hoy) del web.
+     * Se usa para: entradasHoy, salidasHoy, tiempoPromedioEstancia y gráfica por hora.
+     */
+    fun listenActividadHoy(
+        fecha: String,
+        onUpdate: (List<ActividadDashboardItem>) -> Unit
+    ): () -> Unit {
+        val reg = firestore.collection("actividad")
+            .whereEqualTo("fecha", fecha)
+            .addSnapshotListener { snap, _ ->
+                if (snap == null) return@addSnapshotListener
+                val list = snap.documents.mapNotNull { doc ->
+                    val tipo = doc.getString("tipo") ?: return@mapNotNull null
+                    val hora = doc.getString("hora") ?: return@mapNotNull null
+                    ActividadDashboardItem(
+                        tipo       = tipo,
+                        hora       = hora,
+                        placa      = doc.getString("placa").orEmpty(),
+                        duracionMin = doc.getLong("duracionMin")?.toInt()
+                    )
+                }
+                onUpdate(list)
+            }
+        return { reg.remove() }
+    }
+
+    /**
+     * Listener de las últimas 5 actividades (cualquier día), ordenadas por timestamp.
+     * Equivale al getActividadReciente() del web.
+     */
+    fun listenActividadReciente(onUpdate: (List<ActividadDashboardItem>) -> Unit): () -> Unit {
+        val reg = firestore.collection("actividad")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(5)
+            .addSnapshotListener { snap, _ ->
+                if (snap == null) return@addSnapshotListener
+                val list = snap.documents.mapNotNull { doc ->
+                    val tipo = doc.getString("tipo") ?: return@mapNotNull null
+                    val hora = doc.getString("hora") ?: return@mapNotNull null
+                    ActividadDashboardItem(
+                        tipo       = tipo,
+                        hora       = hora,
+                        placa      = doc.getString("placa").orEmpty(),
+                        duracionMin = doc.getLong("duracionMin")?.toInt()
+                    )
+                }
+                onUpdate(list)
+            }
+        return { reg.remove() }
     }
 }

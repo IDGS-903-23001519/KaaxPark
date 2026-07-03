@@ -2,125 +2,298 @@ package org.utl.idgs903.appkaaxpark.Admin
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity  // solo para las dependencias transitivas de BaseAdminActivity
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
 import org.utl.idgs903.appkaaxpark.R
+import org.utl.idgs903.appkaaxpark.data.ActividadDashboardItem
 import org.utl.idgs903.appkaaxpark.data.CajonInfo
-import org.utl.idgs903.appkaaxpark.data.EstanciaResumen
 import org.utl.idgs903.appkaaxpark.data.FirebaseRepository
-import org.utl.idgs903.appkaaxpark.data.ParkingStats
-import org.utl.idgs903.appkaaxpark.data.ReportPeriod
-import org.utl.idgs903.appkaaxpark.data.SessionManager
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
+import kotlin.math.max
+import kotlin.math.roundToInt
 
+/**
+ * Dashboard de administrador con datos en tiempo real de Firebase.
+ * Funcionalidad equivalente al DashboardComponent de la página web:
+ *   - Stat cards: Entradas Hoy, Salidas Hoy, Ocupación, Tiempo Promedio
+ *   - Gráfica de ocupación por hora (MPAndroidChart)
+ *   - Lista de actividad reciente
+ *
+ * Si tu clase ya extiende BaseActivity, cambia AppCompatActivity por BaseActivity,
+ * agrega `override fun getLayoutId() = R.layout.activity_dashboard` y elimina
+ * la línea `setContentView(...)` del onCreate.
+ */
 class Dashboard : BaseAdminActivity() {
-
-    private lateinit var repository: FirebaseRepository
-    private lateinit var sessionManager: SessionManager
 
     override fun getLayoutId(): Int = R.layout.activity_dashboard
 
+    private lateinit var repository: FirebaseRepository
+
+    // ── Views ─────────────────────────────────────────────────────────────────
+    private lateinit var numEntradas: TextView
+    private lateinit var numSalidas: TextView
+    private lateinit var numOcupacion: TextView
+    private lateinit var numTiempo: TextView
+    private lateinit var lineChart: LineChart
+    private lateinit var contenedorActividad: LinearLayout
+
+    // ── Estado ────────────────────────────────────────────────────────────────
+    private var cajones: List<CajonInfo> = emptyList()
+    private var actividadHoy: List<ActividadDashboardItem> = emptyList()
+    private var actividadReciente: List<ActividadDashboardItem> = emptyList()
+
+    private var cancelarCajones: (() -> Unit)? = null
+    private var cancelarActividadHoy: (() -> Unit)? = null
+    private var cancelarActividadReciente: (() -> Unit)? = null
+
+    // ── Lifecycle ─────────────────────────────────────────────────────────────
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // setContentView NO va aquí — BaseAdminActivity ya infla
+        // activity_layout_base_admin.xml y mete getLayoutId() en containerDashboard.
+
         repository = FirebaseRepository()
-        sessionManager = SessionManager(this)
+
+        numEntradas         = findViewById(R.id.numEntradas)
+        numSalidas          = findViewById(R.id.numSalidas)
+        numOcupacion        = findViewById(R.id.numOcupacion)
+        numTiempo           = findViewById(R.id.numTiempo)
+        lineChart           = findViewById(R.id.lineChart)
+        contenedorActividad = findViewById(R.id.contenedorActividad)
+
+        setupLineChart()
+        iniciarListeners()
     }
 
-    override fun onStart() {
-        super.onStart()
-        loadAdminGreeting()
-        loadEstadisticas()
+    override fun onDestroy() {
+        super.onDestroy()
+        cancelarCajones?.invoke()
+        cancelarActividadHoy?.invoke()
+        cancelarActividadReciente?.invoke()
     }
 
-    private fun loadAdminGreeting() {
-        val session = sessionManager.getSession() ?: return
-        repository.fetchUserProfileByDocumentId(session.userDocId) { result ->
-            result.onSuccess { profile ->
-                findViewById<TextView>(R.id.lblBienvenido)?.text = "Bienvenido, ${profile.displayName}"
+    // ── Listeners en tiempo real ───────────────────────────────────────────────
+    private fun iniciarListeners() {
+        // 1. Cajones: para ocupación y total
+        cancelarCajones = repository.listenCajones { lista ->
+            cajones = lista
+            actualizarEstadisticas()
+            actualizarGrafica()
+        }
+
+        // 2. Actividad de hoy: para conteos y gráfica por hora
+        val hoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        cancelarActividadHoy = repository.listenActividadHoy(hoy) { lista ->
+            actividadHoy = lista
+            actualizarEstadisticas()
+            actualizarGrafica()
+        }
+
+        // 3. Actividad reciente (últimas 5): para la lista
+        cancelarActividadReciente = repository.listenActividadReciente { lista ->
+            actividadReciente = lista
+            renderizarActividad()
+        }
+    }
+
+    // ── Stat cards ────────────────────────────────────────────────────────────
+    private fun actualizarEstadisticas() {
+        val entradas = actividadHoy.count { it.tipo == "entrada" }
+        val salidas  = actividadHoy.count { it.tipo == "salida" }
+        val ocupados = cajones.count { it.estado.equals("Ocupado", ignoreCase = true) }
+        val total    = cajones.size
+        val pct      = if (total > 0) (ocupados * 100f / total).roundToInt() else 0
+
+        numEntradas.text  = entradas.toString()
+        numSalidas.text   = salidas.toString()
+        numOcupacion.text = "$pct%"
+        numTiempo.text    = calcularTiempoPromedio()
+    }
+
+    /** Promedio de estancias COMPLETADAS hoy — igual que el web. */
+    private fun calcularTiempoPromedio(): String {
+        val duraciones = actividadHoy
+            .filter { it.tipo == "salida" && it.duracionMin != null }
+            .mapNotNull { it.duracionMin }
+        if (duraciones.isEmpty()) return "—"
+        val avg = duraciones.average().roundToInt()
+        return if (avg < 60) "${avg} min"
+        else { val h = avg / 60; val m = avg % 60; if (m > 0) "${h}h ${m}m" else "${h}h" }
+    }
+
+    // ── Gráfica de ocupación por hora ─────────────────────────────────────────
+    private fun setupLineChart() {
+        lineChart.apply {
+            description.isEnabled = false
+            setTouchEnabled(false)
+            setScaleEnabled(false)
+            legend.isEnabled = false
+            axisRight.isEnabled = false
+            setNoDataText("Cargando datos…")
+            setNoDataTextColor(Color.GRAY)
+            setBackgroundColor(Color.TRANSPARENT)
+        }
+        lineChart.xAxis.apply {
+            position  = XAxis.XAxisPosition.BOTTOM
+            granularity = 1f
+            setDrawGridLines(false)
+            textColor = Color.parseColor("#B0B5B8")
+            textSize  = 9f
+        }
+        lineChart.axisLeft.apply {
+            axisMinimum = 0f
+            axisMaximum = 100f
+            textColor   = Color.parseColor("#B0B5B8")
+            textSize    = 9f
+            gridColor   = Color.parseColor("#2A2A2A")
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float) = "${value.toInt()}%"
             }
         }
     }
 
-    private fun loadEstadisticas() {
-        repository.fetchCajones { cajonesResult ->
-            cajonesResult.onSuccess { cajones ->
-                repository.fetchEstancias { estanciasResult ->
-                    estanciasResult.onSuccess { estancias ->
-                        renderEstadisticas(cajones, estancias)
-                    }
-                    estanciasResult.onFailure { error ->
-                        Toast.makeText(
-                            this,
-                            error.message ?: "No fue posible cargar las estancias.",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+    /**
+     * Reconstruye la ocupación neta acumulada (entradas - salidas) por hora,
+     * mismo algoritmo que el getter ocupacionPorHora del DashboardComponent web.
+     */
+    private fun actualizarGrafica() {
+        val horaActual = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val total    = cajones.size
+        val labels   = mutableListOf<String>()
+        val entries  = mutableListOf<Entry>()
+        var acumulado = 0
+
+        for (h in 0..horaActual) {
+            val eventosDeLaHora = actividadHoy.filter {
+                it.hora.split(":").firstOrNull()?.toIntOrNull() == h
+            }
+            for (ev in eventosDeLaHora) {
+                when (ev.tipo) {
+                    "entrada" -> acumulado++
+                    "salida"  -> acumulado = max(0, acumulado - 1)
                 }
             }
-            cajonesResult.onFailure { error ->
-                Toast.makeText(
-                    this,
-                    error.message ?: "No fue posible cargar los cajones.",
-                    Toast.LENGTH_LONG
-                ).show()
+            labels.add(String.format("%02d:00", h))
+            entries.add(
+                Entry(h.toFloat(),
+                    if (total > 0) (acumulado.toFloat() / total * 100).coerceIn(0f, 100f) else 0f)
+            )
+        }
+
+        if (entries.isEmpty()) return
+
+        val dataSet = LineDataSet(entries, "Ocupación").apply {
+            color              = Color.parseColor("#C9A227")
+            setCircleColor(Color.parseColor("#C9A227"))
+            circleRadius       = 3f
+            lineWidth          = 2f
+            setDrawValues(false)
+            mode               = LineDataSet.Mode.CUBIC_BEZIER
+            setDrawFilled(true)
+            fillColor          = Color.parseColor("#C9A227")
+            fillAlpha          = 30
+        }
+
+        lineChart.data = LineData(dataSet)
+        lineChart.xAxis.apply {
+            labelCount = minOf(labels.size, 6)
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    val idx = value.toInt()
+                    return if (idx in labels.indices) labels[idx] else ""
+                }
             }
         }
+        lineChart.invalidate()
     }
 
-    private fun renderEstadisticas(cajones: List<CajonInfo>, estancias: List<EstanciaResumen>) {
-        val ahora = Date()
-        val hoy = ParkingStats.rangeFor(ReportPeriod.DIA, ahora)
-        val ayerReferencia = addDays(ahora, -1)
-        val ayer = ParkingStats.rangeFor(ReportPeriod.DIA, ayerReferencia)
-        val semana = ParkingStats.rangeFor(ReportPeriod.SEMANA, ahora)
+    // ── Lista de actividad reciente ───────────────────────────────────────────
+    /** Renderiza la lista programáticamente (máx. 5 items, sin RecyclerView). */
+    private fun renderizarActividad() {
+        contenedorActividad.removeAllViews()
 
-        val entradasHoy = ParkingStats.countEntradas(estancias, hoy)
-        val entradasAyer = ParkingStats.countEntradas(estancias, ayer)
-        val salidasHoy = ParkingStats.countSalidas(estancias, hoy)
-        val salidasAyer = ParkingStats.countSalidas(estancias, ayer)
-
-        val ocupados = cajones.count { !it.isLibre }
-        val ocupacionPorcentaje = if (cajones.isNotEmpty()) ocupados * 100 / cajones.size else 0
-
-        val tiempoPromedioMillis = ParkingStats.averageStayDurationMillis(estancias, semana)
-
-        findViewById<TextView>(R.id.numEntradas)?.text = entradasHoy.toString()
-        findViewById<TextView>(R.id.numSalidas)?.text = salidasHoy.toString()
-        findViewById<TextView>(R.id.numOcupacion)?.text = "$ocupacionPorcentaje%"
-        findViewById<TextView>(R.id.numTiempo)?.text = tiempoPromedioMillis?.let { ParkingStats.formatDuration(it) } ?: "--:--:--"
-
-        bindCambioPorcentual(R.id.txtCambioEntradas, entradasAyer, entradasHoy)
-        bindCambioPorcentual(R.id.txtCambioSalidas, salidasAyer, salidasHoy)
-    }
-
-    private fun bindCambioPorcentual(viewId: Int, valorAnterior: Int, valorActual: Int) {
-        val txt = findViewById<TextView>(viewId) ?: return
-        if (valorAnterior == 0) {
-            if (valorActual == 0) {
-                txt.text = "Sin cambios"
-                txt.setTextColor(Color.parseColor("#B0B5B8"))
-            } else {
-                txt.text = "↑ Nuevo"
-                txt.setTextColor(Color.parseColor("#4CAF50"))
-            }
+        if (actividadReciente.isEmpty()) {
+            contenedorActividad.addView(TextView(this).apply {
+                text      = "Sin actividad registrada aún"
+                setTextColor(Color.parseColor("#777777"))
+                textSize  = 13f
+                gravity   = Gravity.CENTER
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { setMargins(0, dp(24), 0, dp(24)) }
+            })
             return
         }
 
-        val cambio = (valorActual - valorAnterior) * 100 / valorAnterior
-        if (cambio >= 0) {
-            txt.text = "↑ $cambio%"
-            txt.setTextColor(Color.parseColor("#4CAF50"))
-        } else {
-            txt.text = "↓ $cambio%"
-            txt.setTextColor(Color.parseColor("#F44336"))
+        actividadReciente.forEachIndexed { index, item ->
+            // Fila horizontal
+            val row = LinearLayout(this).apply {
+                orientation  = LinearLayout.HORIZONTAL
+                gravity      = Gravity.CENTER_VERTICAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                setPadding(0, dp(14), 0, dp(14))
+            }
+
+            // Indicador de color (entrada=verde, salida=rojo)
+            row.addView(View(this).apply {
+                layoutParams = LinearLayout.LayoutParams(dp(8), dp(8)).apply { rightMargin = dp(12) }
+                setBackgroundColor(
+                    if (item.tipo == "entrada") Color.parseColor("#4CAF50")
+                    else Color.parseColor("#F44336")
+                )
+            })
+
+            // Columna tipo + placa
+            val info = LinearLayout(this).apply {
+                orientation  = LinearLayout.VERTICAL
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+            info.addView(TextView(this).apply {
+                text     = if (item.tipo == "entrada") "Entrada de Vehículo" else "Salida de Vehículo"
+                setTextColor(Color.WHITE)
+                textSize = 13f
+            })
+            info.addView(TextView(this).apply {
+                text     = item.placa.ifBlank { "—" }
+                setTextColor(Color.parseColor("#A0A0A0"))
+                textSize = 11f
+            })
+            row.addView(info)
+
+            // Hora (dorado)
+            row.addView(TextView(this).apply {
+                text     = item.hora
+                setTextColor(Color.parseColor("#D4A017"))
+                textSize = 12f
+            })
+
+            contenedorActividad.addView(row)
+
+            // Divisor (excepto último)
+            if (index < actividadReciente.size - 1) {
+                contenedorActividad.addView(View(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1)
+                    setBackgroundColor(Color.parseColor("#2A2A2A"))
+                })
+            }
         }
     }
 
-    private fun addDays(date: Date, days: Int): Date {
-        val calendar = Calendar.getInstance()
-        calendar.time = date
-        calendar.add(Calendar.DAY_OF_MONTH, days)
-        return calendar.time
-    }
+    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 }
