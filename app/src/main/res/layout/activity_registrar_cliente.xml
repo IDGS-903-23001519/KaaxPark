@@ -6,7 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="@drawable/bg_screen_glass"
     tools:context=".Cliente.RegistrarCliente">
 
     <ImageView
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="115dp"
         android:text="Park"
-        android:textColor="#D4A017"
+        android:textColor="@color/gold_primary"
         android:textSize="32sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/imgLogo"
@@ -65,8 +65,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             app:cardCornerRadius="25dp"
-            app:cardBackgroundColor="#111111"
-            app:cardElevation="0dp">
+            app:cardBackgroundColor="@color/glass_surface"
+            app:cardElevation="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -77,252 +77,252 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="15dp"
                     android:text="Registro de Cliente"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="15dp"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
                     android:text="Datos de la cuenta"
-                    android:textColor="#D4A017"
+                    android:textColor="@color/gold_primary"
                     android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="6dp"/>
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:orientation="horizontal"
-                    android:background="#222222"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/bg_input_field"
                     android:gravity="center_vertical"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/icon_usuario"
-                        app:tint="#D4A017"/>
+                        app:tint="@color/gold_primary"/>
                     <EditText
                         android:id="@+id/txtNombreReg"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="8dp"
+                        android:layout_weight="1"
                         android:background="@null"
                         android:hint="Nombre completo"
                         android:inputType="textPersonName"
                         android:textColor="#FFFFFF"
-                        android:textColorHint="#7A7A7A"
+                        android:textColorHint="#B0B5B8"
                         android:textSize="15sp"/>
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:orientation="horizontal"
-                    android:background="#222222"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/bg_input_field"
                     android:gravity="center_vertical"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/icon_telefono"
-                        app:tint="#D4A017"/>
+                        app:tint="@color/gold_primary"/>
                     <EditText
                         android:id="@+id/txtTelefonoReg"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="8dp"
+                        android:layout_weight="1"
                         android:background="@null"
                         android:hint="Número de teléfono"
                         android:inputType="phone"
                         android:textColor="#FFFFFF"
-                        android:textColorHint="#7A7A7A"
+                        android:textColorHint="#B0B5B8"
                         android:textSize="15sp"/>
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:orientation="horizontal"
-                    android:background="#222222"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/bg_input_field"
                     android:gravity="center_vertical"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/icon_correo"
-                        app:tint="#D4A017"/>
+                        app:tint="@color/gold_primary"/>
                     <EditText
                         android:id="@+id/txtCorreoReg"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="8dp"
+                        android:layout_weight="1"
                         android:background="@null"
                         android:hint="Correo electrónico"
                         android:inputType="textEmailAddress"
                         android:textColor="#FFFFFF"
-                        android:textColorHint="#7A7A7A"
+                        android:textColorHint="#B0B5B8"
                         android:textSize="15sp"/>
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:orientation="horizontal"
-                    android:background="#222222"
+                    android:layout_marginBottom="15dp"
+                    android:background="@drawable/bg_input_field"
                     android:gravity="center_vertical"
-                    android:padding="10dp"
-                    android:layout_marginBottom="15dp">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/icon_password"
-                        app:tint="#D4A017"/>
+                        app:tint="@color/gold_primary"/>
                     <EditText
                         android:id="@+id/txtPasswordReg"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="8dp"
+                        android:layout_weight="1"
                         android:background="@null"
                         android:hint="Contraseña"
                         android:inputType="textPassword"
                         android:textColor="#FFFFFF"
-                        android:textColorHint="#7A7A7A"
+                        android:textColorHint="#B0B5B8"
                         android:textSize="15sp"/>
                     <ImageView
                         android:id="@+id/imgOjoReg"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/icon_ojo"
-                        app:tint="#FFFFFF"
                         android:clickable="true"
-                        android:focusable="true"/>
+                        android:focusable="true"
+                        android:src="@drawable/icon_ojo"
+                        app:tint="#FFFFFF"/>
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
                     android:text="Datos del Vehículo"
-                    android:textColor="#D4A017"
+                    android:textColor="@color/gold_primary"
                     android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="6dp"/>
+                    android:textStyle="bold"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:orientation="horizontal"
-                    android:background="#222222"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/bg_input_field"
                     android:gravity="center_vertical"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/icon_etiqueta"
-                        app:tint="#D4A017"/>
+                        app:tint="@color/gold_primary"/>
                     <EditText
                         android:id="@+id/txtMarcaReg"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="8dp"
+                        android:layout_weight="1"
                         android:background="@null"
                         android:hint="Marca (Ej: Toyota)"
                         android:inputType="textCapWords"
                         android:textColor="#FFFFFF"
-                        android:textColorHint="#7A7A7A"
+                        android:textColorHint="#B0B5B8"
                         android:textSize="15sp"/>
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:orientation="horizontal"
-                    android:background="#222222"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/bg_input_field"
                     android:gravity="center_vertical"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/icon_vehiculo"
-                        app:tint="#D4A017"/>
+                        app:tint="@color/gold_primary"/>
                     <EditText
                         android:id="@+id/txtModeloReg"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="8dp"
+                        android:layout_weight="1"
                         android:background="@null"
                         android:hint="Modelo (Ej: Corolla)"
                         android:inputType="textCapWords"
                         android:textColor="#FFFFFF"
-                        android:textColorHint="#7A7A7A"
+                        android:textColorHint="#B0B5B8"
                         android:textSize="15sp"/>
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:orientation="horizontal"
-                    android:background="#222222"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/bg_input_field"
                     android:gravity="center_vertical"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/icon_colorc"
-                        app:tint="#D4A017"/>
+                        app:tint="@color/gold_primary"/>
                     <EditText
                         android:id="@+id/txtColorReg"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="8dp"
+                        android:layout_weight="1"
                         android:background="@null"
                         android:hint="Color"
                         android:inputType="textCapWords"
                         android:textColor="#FFFFFF"
-                        android:textColorHint="#7A7A7A"
+                        android:textColorHint="#B0B5B8"
                         android:textSize="15sp"/>
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:orientation="horizontal"
-                    android:background="#222222"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/bg_input_field"
                     android:gravity="center_vertical"
-                    android:padding="10dp"
-                    android:layout_marginBottom="20dp">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/icon_placac"
-                        app:tint="#D4A017"/>
+                        app:tint="@color/gold_primary"/>
                     <EditText
                         android:id="@+id/txtPlacaReg"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="8dp"
+                        android:layout_weight="1"
                         android:background="@null"
                         android:hint="Placas"
                         android:inputType="textCapCharacters"
                         android:textColor="#FFFFFF"
-                        android:textColorHint="#7A7A7A"
+                        android:textColorHint="#B0B5B8"
                         android:textSize="15sp"/>
                 </LinearLayout>
 
@@ -331,12 +331,12 @@
                     android:layout_width="260dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
+                    android:background="@drawable/bg_boton_contornoregistrar"
                     android:text="Registrarse"
                     android:textAllCaps="false"
+                    android:textColor="@color/gold_primary"
                     android:textSize="16sp"
-                    android:textColor="#D4A017"
-                    android:textStyle="bold"
-                    android:background="@drawable/bg_boton_contornoregistrar"/>
+                    android:textStyle="bold" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -346,29 +346,29 @@
         android:id="@+id/layoutInferior"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="20dp">
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="¿Ya tienes cuenta? "
             android:textColor="#FFFFFF"
-            android:textSize="15sp"/>
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/txtLoginRegresar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Inicia sesión"
-            android:textColor="#D4A017"
-            android:textStyle="bold"
-            android:textSize="15sp"
             android:clickable="true"
-            android:focusable="true"/>
+            android:focusable="true"
+            android:text="Inicia sesión"
+            android:textColor="@color/gold_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

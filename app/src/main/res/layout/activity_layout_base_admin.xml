@@ -5,7 +5,7 @@
     android:id="@+id/main_base_admin"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="@drawable/bg_screen_glass">
 
     <ImageView
         android:id="@+id/btnPerfil"
@@ -36,7 +36,12 @@
         android:layout_height="95dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
         android:paddingBottom="10dp"
+        android:background="@drawable/bg_bottom_nav"
+        android:elevation="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -98,8 +103,10 @@
                 android:layout_height="70dp"
                 android:clickable="true"
                 android:focusable="true"
+                android:contentDescription="Abrir asistente IA"
                 app:cardCornerRadius="35dp"
-                app:cardBackgroundColor="#2A2415">
+                app:cardBackgroundColor="@color/gold_primary"
+                app:cardElevation="10dp">
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="52dp"

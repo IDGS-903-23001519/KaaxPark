@@ -8,7 +8,7 @@
     android:paddingHorizontal="16dp"
     android:paddingTop="4dp"
     tools:context=".Admin.GestionUsuarios"
-    android:background="#000000">
+    android:background="@drawable/bg_screen_glass">
 
     <TextView
         android:id="@+id/lblTituloGestion"
@@ -95,7 +95,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginEnd="4dp"
-            app:cardBackgroundColor="#1F2022"
+            app:cardBackgroundColor="@color/glass_surface"
             app:cardCornerRadius="16dp">
             <LinearLayout
                 android:layout_width="match_parent"
@@ -125,7 +125,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginHorizontal="2dp"
-            app:cardBackgroundColor="#1F2022"
+            app:cardBackgroundColor="@color/glass_surface"
             app:cardCornerRadius="16dp">
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -180,7 +180,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginStart="4dp"
-            app:cardBackgroundColor="#1F2022"
+            app:cardBackgroundColor="@color/glass_surface"
             app:cardCornerRadius="16dp">
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"

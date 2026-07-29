@@ -1,8 +1,23 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.AppKaaxPark" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/gold_primary</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/gold_secondary</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorTertiary">@color/gold_light</item>
+        <item name="colorSurface">@color/glass_surface</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorSurfaceVariant">@color/glass_surface_soft</item>
+        <item name="colorOutline">@color/glass_border</item>
+        <item name="android:textViewStyle">@style/Widget.AppKaaxPark.TextView</item>
+        <item name="android:editTextStyle">@style/Widget.AppKaaxPark.EditText</item>
+        <item name="android:buttonStyle">@style/Widget.AppKaaxPark.Button</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@drawable/bg_screen_glass</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 
     <style name="Theme.AppKaaxPark" parent="Base.Theme.AppKaaxPark" />

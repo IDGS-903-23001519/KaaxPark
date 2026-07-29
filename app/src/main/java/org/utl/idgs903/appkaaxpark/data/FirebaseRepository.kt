@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import org.utl.idgs903.appkaaxpark.data.ai.UserVisitDetail
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -1088,7 +1089,77 @@ class FirebaseRepository(
             .addOnFailureListener { callback(Result.success(60.0)) }
     }
 
-// ─── PAGOS ──────────────────────────────────────────────────────────────────
+/**
+     * Obtiene el historial de visitas del usuario [usuarioId] con detalles completos
+     * (vehículo, cajón, tiempos, costo). Devuelve la lista ordenada cronológicamente.
+     */
+    fun fetchUserVisitHistoryWithDetails(
+        usuarioId: String,
+        callback: (Result<List<UserVisitDetail>>) -> Unit
+    ) {
+        fetchTarifaPorHora { tarifaResult ->
+            val tarifaPorHoraReal = tarifaResult.getOrNull() ?: 60.0
+
+            firestore.collection("estancias")
+                .whereEqualTo("usuarioId", usuarioId)
+                .whereEqualTo("estatus", "FINALIZADA")
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    val docIds = snapshot.documents.map { it.id }
+                    if (docIds.isEmpty()) {
+                        callback(Result.success(emptyList()))
+                        return@addOnSuccessListener
+                    }
+
+                    val visitas = mutableListOf<UserVisitDetail>()
+                    var processed = 0
+
+                    snapshot.documents.forEach { doc ->
+                        val cajonId = doc.getString("cajonId") ?: ""
+                        val fechaEntrada = doc.getTimestamp("fechaEntrada") ?: return@forEach
+                        val fechaSalida = doc.getTimestamp("fechaSalida") ?: return@forEach
+                        val montoTotal = doc.getDouble("montoTotal") ?: 0.0
+                        val vehiculoId = doc.getString("vehiculoId") ?: ""
+
+                        val entrada = fechaEntrada.toDate()
+                        val salida = fechaSalida.toDate()
+                        val duracionMillis = salida.time - entrada.time
+                        val totalSeconds = duracionMillis / 1000L
+                        val horas = totalSeconds / 3600L
+                        val minutos = (totalSeconds % 3600L) / 60L
+                        val segundos = totalSeconds % 60L
+                        val tiempoTexto = String.format("%02d:%02d:%02d", horas, minutos, segundos)
+
+                        fetchVehicleByDocumentId(vehiculoId) { vehicleResult ->
+                            val vehicle = vehicleResult.getOrNull()
+                            val fechaClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(entrada)
+                            val fechaDisplay = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(entrada)
+                            visitas.add(
+                                UserVisitDetail(
+                                    fecha = fechaClave,
+                                    fechaDisplay = fechaDisplay,
+                                    vehiculo = vehicle?.brand ?: "Desconocido",
+                                    placa = vehicle?.plate ?: "--",
+                                    cajon = cajonId,
+                                    entrada = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(entrada),
+                                    salida = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(salida),
+                                    tiempoEstacionado = tiempoTexto,
+                                    tarifaPorHora = tarifaPorHoraReal,
+                                    totalPagado = montoTotal
+                                )
+                            )
+                            processed++
+                            if (processed == docIds.size) {
+                                callback(Result.success(visitas.sortedBy { it.fecha }))
+                            }
+                        }
+                    }
+                }
+                .addOnFailureListener { error -> callback(Result.failure(error)) }
+        }
+    }
+
+    // ─── PAGOS ──────────────────────────────────────────────────────────────────
     /**
      * Crea un registro en la colección 'pagos' (la misma que lee la página web).
      *
@@ -1154,6 +1225,156 @@ class FirebaseRepository(
                 onCambio(estado)
             }
         return { registration.remove() }
+    }
+
+    // ─── CONTADORES GLOBALES ─────────────────────────────────────────────────
+
+    /**
+     * Cuenta los clientes registrados en la colección 'usuariosc'.
+     */
+    fun fetchClientCount(callback: (Result<Int>) -> Unit) {
+        firestore.collection("usuariosc")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                callback(Result.success(snapshot.size()))
+            }
+            .addOnFailureListener { error -> callback(Result.failure(error)) }
+    }
+
+    /**
+     * Cuenta los vehículos registrados en la colección 'vehiculos'
+     * (excluyendo los eliminados lógicamente).
+     */
+    fun fetchVehicleCount(callback: (Result<Int>) -> Unit) {
+        firestore.collection("vehiculos")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val count = snapshot.documents.count { !it.estaEliminado() }
+                callback(Result.success(count))
+            }
+            .addOnFailureListener { error -> callback(Result.failure(error)) }
+    }
+
+    fun fetchAdminCount(callback: (Result<Int>) -> Unit) {
+        firestore.collection("usuarios")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val count = snapshot.documents.count {
+                    it.getString("puesto")?.equals("Administrador", ignoreCase = true) == true
+                }
+                callback(Result.success(count))
+            }
+            .addOnFailureListener { error -> callback(Result.failure(error)) }
+    }
+
+    
+    // ─── DATOS ESPECÍFICOS DEL USUARIO ──────────────────────────────────────
+
+    /**
+     * Obtiene las visitas finalizadas del usuario [usuarioId] que ocurrieron
+     * en la fecha [fecha] (formato "yyyy-MM-dd") y devuelve la duración
+     * total en minutos junto con el detalle de cada estancia.
+     */
+    fun fetchUserVisitDurationsForDate(
+        usuarioId: String,
+        fecha: String,
+        callback: (Result<Map<String, Any>>) -> Unit
+    ) {
+        firestore.collection("estancias")
+            .whereEqualTo("usuarioId", usuarioId)
+            .whereEqualTo("estatus", "FINALIZADA")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val formato = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val visitasDelDia = snapshot.documents
+                    .mapNotNull { doc ->
+                        val entry = doc.getTimestamp("fechaEntrada") ?: return@mapNotNull null
+                        val salida = doc.getTimestamp("fechaSalida")
+                        if (salida == null) return@mapNotNull null
+                        val entryDate = formato.format(entry.toDate())
+                        if (entryDate != fecha) return@mapNotNull null
+                        val duracionMin = Math.round((salida.toDate().time - entry.toDate().time) / 60000.0).toInt()
+                        mapOf(
+                            "cajonId" to (doc.getString("cajonId") ?: ""),
+                            "duracionMin" to duracionMin,
+                            "montoTotal" to (doc.getDouble("montoTotal") ?: 0.0)
+                        )
+                    }
+                val duracionTotalMin = visitasDelDia.sumOf { (it["duracionMin"] as? Int) ?: 0 }
+                val montoTotal = visitasDelDia.sumOf { (it["montoTotal"] as? Double) ?: 0.0 }
+                callback(
+                    Result.success(
+                        mapOf(
+                            "fecha" to fecha,
+                            "totalVisitas" to visitasDelDia.size,
+                            "duracionTotalMin" to duracionTotalMin,
+                            "montoTotal" to montoTotal,
+                            "detalle" to visitasDelDia
+                        )
+                    )
+                )
+            }
+            .addOnFailureListener { error -> callback(Result.failure(error)) }
+    }
+
+    /**
+     * Obtiene la estancia activa del usuario [usuarioId] junto con la
+     * información del vehículo asociado. Devuelve null si no hay estancia activa.
+     */
+    fun fetchCurrentStayForUser(
+        usuarioId: String,
+        callback: (Result<Map<String, Any>?>) -> Unit
+    ) {
+        firestore.collection("estancias")
+            .whereEqualTo("usuarioId", usuarioId)
+            .whereEqualTo("estatus", "ACTIVA")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val activeDoc = snapshot.documents.firstOrNull() ?: run {
+                    callback(Result.success(null))
+                    return@addOnSuccessListener
+                }
+                val cajonId = activeDoc.getString("cajonId") ?: ""
+                val vehiculoId = activeDoc.getString("vehiculoId") ?: ""
+                val entryTimestamp = activeDoc.getTimestamp("fechaEntrada")
+                if (entryTimestamp == null) {
+                    callback(Result.success(null))
+                    return@addOnSuccessListener
+                }
+                val entryMillis = entryTimestamp.toDate().time
+                val elapsedMillis = System.currentTimeMillis() - entryMillis
+                val horas = elapsedMillis / 3600000L
+                val minutos = (elapsedMillis % 3600000L) / 60000L
+                val duracionActualMin = (horas * 60 + minutos).toInt()
+
+                fetchVehicleByDocumentId(vehiculoId) { vehicleResult ->
+                    vehicleResult.onSuccess { vehicle ->
+                        callback(
+                            Result.success(
+                                mapOf(
+                                    "cajonId" to cajonId,
+                                    "vehiculoMarca" to vehicle.brand,
+                                    "vehiculoModelo" to vehicle.model,
+                                    "vehiculoPlaca" to vehicle.plate,
+                                    "vehiculoColor" to vehicle.color,
+                                    "entradaMillis" to entryMillis,
+                                    "duracionActualMin" to duracionActualMin,
+                                    "duracionActualTexto" to formatDuration(elapsedMillis)
+                                )
+                            )
+                        )
+                    }.onFailure { error -> callback(Result.failure(error)) }
+                }
+            }
+            .addOnFailureListener { error -> callback(Result.failure(error)) }
+    }
+
+    private fun formatDuration(millis: Long): String {
+        val totalSeconds = millis / 1000L
+        val horas = totalSeconds / 3600L
+        val minutos = (totalSeconds % 3600L) / 60L
+        val segundos = totalSeconds % 60L
+        return String.format("%02d:%02d:%02d", horas, minutos, segundos)
     }
 
     // ─── DASHBOARD ───────────────────────────────────────────────────────────────

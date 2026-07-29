@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="@drawable/bg_screen_glass"
     tools:context=".Cliente.SeleccionarMetodoPago">
 
     <LinearLayout
@@ -140,7 +140,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="#222222"
+            android:background="@drawable/bg_input_field"
             android:gravity="center_vertical"
             android:padding="10dp"
             android:layout_marginBottom="10dp">
@@ -160,7 +160,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="#222222"
+            android:background="@drawable/bg_input_field"
             android:gravity="center_vertical"
             android:padding="10dp"
             android:layout_marginBottom="10dp">
@@ -186,7 +186,7 @@
                 android:layout_height="50dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="5dp"
-                android:background="#222222"
+                android:background="@drawable/bg_input_field"
                 android:gravity="center_vertical"
                 android:padding="10dp">
                 <EditText
@@ -206,7 +206,7 @@
                 android:layout_height="50dp"
                 android:layout_weight="1"
                 android:layout_marginStart="5dp"
-                android:background="#222222"
+                android:background="@drawable/bg_input_field"
                 android:gravity="center_vertical"
                 android:padding="10dp">
                 <EditText

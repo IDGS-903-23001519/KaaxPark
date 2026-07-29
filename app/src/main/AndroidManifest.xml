@@ -55,6 +55,10 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".Admin.AsistenteIA"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".Admin.Cajones"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -86,6 +90,11 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".Cliente.MisVehiculos"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".Cliente.ClienteAsistenteIA"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 

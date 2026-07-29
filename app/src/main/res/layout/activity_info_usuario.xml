@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
-    android:id="@+id/main">
+    android:background="@drawable/bg_screen_glass">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,50 +12,48 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- Avatar -->
-
-        <!-- Nombre -->
         <TextView
             android:id="@+id/txtNombre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
             android:text="Nombre Usuario"
             android:textColor="#FFFFFF"
-            android:textStyle="bold"
             android:textSize="28sp"
-            android:layout_gravity="center"
-            android:layout_marginTop="15dp"/>
+            android:textStyle="bold" />
 
-        <!-- Rol -->
         <TextView
             android:id="@+id/txtRol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:text="ADMIN"
-            android:textColor="#D4A017"
-            android:textStyle="bold"
+            android:textColor="@color/gold_primary"
             android:textSize="16sp"
-            android:layout_gravity="center"/>
-        <!-- Estado -->
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtEstado"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ACTIVO"
-            android:textColor="#FFFFFF"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_chip_ok"
+            android:gravity="center"
             android:paddingHorizontal="15dp"
             android:paddingVertical="6dp"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center"/>
+            android:text="ACTIVO"
+            android:textColor="#2ECC71"
+            android:textStyle="bold" />
 
-        <!-- Datos Usuario -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
+            app:cardBackgroundColor="@color/glass_surface"
             app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="#1A1A1A">
+            app:cardElevation="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -67,51 +65,51 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Información Personal"
-                    android:textColor="#D4A017"
-                    android:textStyle="bold"
-                    android:textSize="18sp"/>
+                    android:textColor="@color/gold_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
                     android:text="Correo"
-                    android:textColor="#808080"
-                    android:layout_marginTop="15dp"/>
+                    android:textColor="@color/glass_text_muted" />
 
                 <TextView
                     android:id="@+id/txtEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#FFFFFF"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/lblCampoSecundario"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
                     android:text="Usuario"
-                    android:textColor="#808080"
-                    android:layout_marginTop="15dp"/>
+                    android:textColor="@color/glass_text_muted" />
 
                 <TextView
                     android:id="@+id/txtCampoSecundario"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#FFFFFF"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
-        <!-- Vehículo -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardVehiculo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            app:cardBackgroundColor="@color/glass_surface"
             app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="#1A1A1A">
+            app:cardElevation="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -123,46 +121,47 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Vehículo Registrado"
-                    android:textColor="#D4A017"
-                    android:textStyle="bold"
-                    android:textSize="18sp"/>
+                    android:textColor="@color/gold_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtMarcaModelo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="15dp"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtColor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_marginTop="10dp"
+                    android:textColor="#FFFFFF" />
 
                 <TextView
                     android:id="@+id/txtPlaca"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_marginTop="10dp"
+                    android:textColor="#FFFFFF" />
 
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
+
         <Button
             android:id="@+id/btnCerrarSesion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:backgroundTint="#D32F2F"
             android:text="Cerrar Sesión"
             android:textAllCaps="false"
-            android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#D32F2F"/>
+            android:textStyle="bold" />
     </LinearLayout>
 
 

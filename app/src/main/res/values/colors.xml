@@ -2,4 +2,20 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gold_primary">#D4A017</color>
+    <color name="gold_secondary">#E5A93C</color>
+    <color name="gold_light">#F0C24B</color>
+    <color name="glass_surface">#33191D21</color>
+    <color name="glass_surface_soft">#22191D21</color>
+    <color name="glass_surface_light">#26FFFFFF</color>
+    <color name="glass_surface_strong">#55191D21</color>
+    <color name="glass_border">#40FFFFFF</color>
+    <color name="glass_border_gold">#66D4A017</color>
+    <color name="glass_divider">#2A2A2A</color>
+    <color name="glass_text_secondary">#B0B5B8</color>
+    <color name="glass_text_muted">#888888</color>
+    <color name="glass_scrim">#66000000</color>
+    <color name="glass_green">#2ECC71</color>
+    <color name="glass_red">#F44336</color>
+    <color name="glass_blue">#2196F3</color>
 </resources>

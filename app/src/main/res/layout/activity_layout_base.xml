@@ -6,7 +6,7 @@
     android:id="@+id/main_base"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="@drawable/bg_screen_glass">
 
     <FrameLayout
         android:id="@+id/contenedor_paginas"
@@ -39,9 +39,9 @@
         android:layout_marginEnd="20dp"
         android:clickable="true"
         android:focusable="true"
-        app:cardBackgroundColor="#1A1A1A"
+        app:cardBackgroundColor="@color/glass_surface"
         app:cardCornerRadius="22dp"
-        app:cardElevation="0dp"
+        app:cardElevation="6dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -62,7 +62,12 @@
         android:layout_height="90dp"
         android:orientation="horizontal"
         android:gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
         android:paddingBottom="10dp"
+        android:background="@drawable/bg_bottom_nav"
+        android:elevation="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -125,7 +130,8 @@
                 android:clickable="true"
                 android:focusable="true"
                 app:cardCornerRadius="38dp"
-                app:cardBackgroundColor="#D4A017">
+                app:cardBackgroundColor="@color/gold_primary"
+                app:cardElevation="10dp">
                 <ImageView
                     android:id="@+id/imgQRMenu"
                     android:layout_width="45dp"
@@ -177,6 +183,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Pago"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnAsistenteIA"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/imgAsistenteIA"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/icon_usuario"/>
+            <TextView
+                android:id="@+id/txtNavAsistenteIA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="IA"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp"/>
         </LinearLayout>

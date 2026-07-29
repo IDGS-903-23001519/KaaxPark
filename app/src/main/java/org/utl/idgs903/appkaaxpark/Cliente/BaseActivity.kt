@@ -55,6 +55,7 @@ abstract class BaseActivity : AppCompatActivity() {
         val btnMenuPago = findViewById<LinearLayout>(R.id.btnMenuPago)
         val btnInfoUsuario = findViewById<ImageView>(R.id.btnPerfil)
         val btnVehiculos = findViewById<CardView>(R.id.btnVehiculos)
+        val btnAsistenteIA = findViewById<LinearLayout>(R.id.btnAsistenteIA)
 
         btnMenuEstancia?.setOnClickListener { viajarA(EstanciaVehiculo::class.java) }
         btnMenuHistorial?.setOnClickListener { viajarA(HistorialVisitas::class.java) }
@@ -63,6 +64,7 @@ abstract class BaseActivity : AppCompatActivity() {
         btnMenuPago?.setOnClickListener { viajarA(DetallePago::class.java) }
         btnInfoUsuario?.setOnClickListener { viajarA(InfoUsuario::class.java) }
         btnVehiculos?.setOnClickListener { viajarA(MisVehiculos::class.java) }
+        btnAsistenteIA?.setOnClickListener { viajarA(ClienteAsistenteIA::class.java) }
     }
 
     private fun actualizarEstadoMenuNavegacion() {
@@ -92,17 +94,14 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
     private fun viajarA(destino: Class<*>) {
-        // El historial y el perfil del usuario siempre deben poder abrirse,
-        // incluso si la navegación está bloqueada (p. ej. mientras no se ha
-        // escaneado el código QR de entrada). Desde el perfil es donde el
-        // cliente puede cerrar sesión, así que nunca debe quedar atrapado.
         val esHistorial = destino == HistorialVisitas::class.java
         val esPerfil = destino == InfoUsuario::class.java
+        val esAsistenteIA = destino == ClienteAsistenteIA::class.java
 
-        if (navegacionBloqueada && !esHistorial && !esPerfil) {
+        if (navegacionBloqueada && !esHistorial && !esPerfil && !esAsistenteIA) {
             Toast.makeText(
                 this,
-                "Escanea el código QR de entrada para continuar.",
+                "Escanea el codigo QR de entrada para continuar.",
                 Toast.LENGTH_SHORT
             ).show()
             return

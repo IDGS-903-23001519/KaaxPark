@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="@drawable/bg_screen_glass"
     android:padding="16dp"
     tools:context=".Admin.Cajones">
 
@@ -87,7 +87,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginEnd="6dp"
-            app:cardBackgroundColor="#1F2022"
+            app:cardBackgroundColor="@color/glass_surface"
             app:cardCornerRadius="16dp">
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -117,7 +117,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginHorizontal="3dp"
-            app:cardBackgroundColor="#1F2022"
+            app:cardBackgroundColor="@color/glass_surface"
             app:cardCornerRadius="16dp">
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -156,7 +156,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginStart="6dp"
-            app:cardBackgroundColor="#1F2022"
+            app:cardBackgroundColor="@color/glass_surface"
             app:cardCornerRadius="16dp">
             <RelativeLayout
                 android:layout_width="match_parent"

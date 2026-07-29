@@ -72,6 +72,9 @@ class Dashboard : BaseAdminActivity() {
         numTiempo           = findViewById(R.id.numTiempo)
         lineChart           = findViewById(R.id.lineChart)
         contenedorActividad = findViewById(R.id.contenedorActividad)
+        findViewById<LinearLayout>(R.id.btnAsistenteIA)?.setOnClickListener {
+            viajarA(AsistenteIA::class.java)
+        }
 
         setupLineChart()
         iniciarListeners()

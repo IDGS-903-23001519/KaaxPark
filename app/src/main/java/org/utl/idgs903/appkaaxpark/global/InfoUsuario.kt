@@ -1,6 +1,7 @@
 package org.utl.idgs903.appkaaxpark.global
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowCompat
 import org.utl.idgs903.appkaaxpark.MainActivity
 import org.utl.idgs903.appkaaxpark.R
 import org.utl.idgs903.appkaaxpark.data.FirebaseRepository
@@ -38,11 +40,12 @@ class InfoUsuario : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
-
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        WindowCompat.getInsetsController(window, window.decorView)?.apply {
+            isAppearanceLightStatusBars = false
+            isAppearanceLightNavigationBars = false
+        }
         setContentView(R.layout.activity_info_usuario)
 
         sessionManager = SessionManager(this)
@@ -104,6 +107,14 @@ class InfoUsuario : AppCompatActivity() {
                     txtNombre.text = usuario.name
                     txtRol.text = usuario.role
                     txtEstado.text = usuario.status
+                    val estadoNormalizado = usuario.status.trim().uppercase()
+                    val esActivo = estadoNormalizado.contains("ACTIVO") || estadoNormalizado.contains("ACTIVE")
+                    txtEstado.setBackgroundResource(
+                        if (esActivo) R.drawable.bg_chip_ok else R.drawable.bg_chip_alerta
+                    )
+                    txtEstado.setTextColor(
+                        if (esActivo) Color.parseColor("#2ECC71") else Color.parseColor("#F44336")
+                    )
                     txtEmail.text = usuario.email
 
                     if (usuario.role.equals("ADMIN", true)) {
