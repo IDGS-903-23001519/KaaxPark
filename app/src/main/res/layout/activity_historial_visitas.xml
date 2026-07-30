@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="68dp"
         android:text="Historial de Visitas"
-        android:textColor="#FFFFFF"
+        android:textColor="#FDFDFD"
         android:textSize="20sp"
         android:textStyle="italic"
         app:layout_constraintTop_toTopOf="parent"
@@ -27,7 +27,7 @@
         android:layout_height="35dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/borde_negro"
+        android:background="@drawable/bg_glass_chip"
         android:gravity="center"
         android:orientation="horizontal"
         android:clickable="true"
@@ -40,31 +40,49 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Todos los registros"
-            android:textColor="#FFFFFF"
+            android:textColor="#FDFDFD"
             android:textSize="12sp"/>
 
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_marginStart="8dp"
-            android:src="@drawable/icon_filtro"/>
+            android:src="@drawable/icon_filtro"
+            app:tint="#8CFFFFFF" />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/txtSinRegistros"
+    <LinearLayout
+        android:id="@+id/cardEstadoVacio"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginHorizontal="24dp"
+        android:background="@drawable/bg_glass_card"
+        android:orientation="vertical"
         android:gravity="center"
-        android:text="Aún no tienes visitas registradas."
-        android:textColor="#AFAFAF"
-        android:textSize="15sp"
+        android:padding="24dp"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/layoutFiltro"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/icon_historial"
+            app:tint="#33FFFFFF" />
+
+        <TextView
+            android:id="@+id/txtSinRegistros"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="Aún no tienes visitas registradas."
+            android:textColor="#8CFFFFFF"
+            android:textSize="15sp" />
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="0dp"

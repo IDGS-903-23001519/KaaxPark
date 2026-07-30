@@ -27,15 +27,16 @@
             android:layout_height="20dp"
             android:src="@drawable/icon_flecha"
             android:rotation="180"
-            app:tint="#D4A017" />
+            app:tint="#F5C55A" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
             android:text="Regresar"
-            android:textColor="#D4A017"
-            android:textSize="14sp" />
+            android:textColor="#F5C55A"
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <TextView
@@ -44,9 +45,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Método de pago"
-        android:textColor="#FFFFFF"
+        android:textColor="#FDFDFD"
         android:textSize="22sp"
-        android:textStyle="italic"
+        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/btnRegresar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -57,7 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="Total a pagar: $0.00"
-        android:textColor="#D4A017"
+        android:textColor="#F5C55A"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/txtTituloMetodo"
@@ -79,7 +80,7 @@
             android:layout_height="100dp"
             android:layout_weight="1"
             android:layout_marginEnd="10dp"
-            android:background="@drawable/borde_negro"
+            android:background="@drawable/bg_glass_card"
             android:gravity="center"
             android:orientation="vertical"
             android:clickable="true"
@@ -88,15 +89,17 @@
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/icon_efectivo" />
+                android:src="@drawable/icon_efectivo"
+                app:tint="#F5C55A" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Efectivo"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp" />
+                android:textColor="#FDFDFD"
+                android:textSize="15sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
@@ -105,7 +108,7 @@
             android:layout_height="100dp"
             android:layout_weight="1"
             android:layout_marginStart="10dp"
-            android:background="@drawable/borde_negro"
+            android:background="@drawable/bg_glass_card"
             android:gravity="center"
             android:orientation="vertical"
             android:clickable="true"
@@ -114,15 +117,17 @@
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/icon_tarjeta" />
+                android:src="@drawable/icon_tarjeta"
+                app:tint="#F5C55A" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Tarjeta"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp" />
+                android:textColor="#FDFDFD"
+                android:textSize="15sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>
@@ -140,7 +145,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
+            android:background="@drawable/bg_input_glass"
             android:gravity="center_vertical"
             android:padding="10dp"
             android:layout_marginBottom="10dp">
@@ -152,15 +157,15 @@
                 android:hint="Número de tarjeta"
                 android:inputType="number"
                 android:maxLength="19"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#7A7A7A"
+                android:textColor="#FDFDFD"
+                android:textColorHint="#4DFFFFFF"
                 android:textSize="15sp"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
+            android:background="@drawable/bg_input_glass"
             android:gravity="center_vertical"
             android:padding="10dp"
             android:layout_marginBottom="10dp">
@@ -171,8 +176,8 @@
                 android:background="@null"
                 android:hint="Nombre en la tarjeta"
                 android:inputType="textCapWords"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#7A7A7A"
+                android:textColor="#FDFDFD"
+                android:textColorHint="#4DFFFFFF"
                 android:textSize="15sp"/>
         </LinearLayout>
 
@@ -186,7 +191,7 @@
                 android:layout_height="50dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="5dp"
-                android:background="@drawable/bg_input_field"
+                android:background="@drawable/bg_input_glass"
                 android:gravity="center_vertical"
                 android:padding="10dp">
                 <EditText
@@ -196,8 +201,8 @@
                     android:background="@null"
                     android:hint="MM/AA"
                     android:maxLength="5"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#7A7A7A"
+                    android:textColor="#FDFDFD"
+                    android:textColorHint="#4DFFFFFF"
                     android:textSize="15sp"/>
             </LinearLayout>
 
@@ -206,7 +211,7 @@
                 android:layout_height="50dp"
                 android:layout_weight="1"
                 android:layout_marginStart="5dp"
-                android:background="@drawable/bg_input_field"
+                android:background="@drawable/bg_input_glass"
                 android:gravity="center_vertical"
                 android:padding="10dp">
                 <EditText
@@ -217,8 +222,8 @@
                     android:hint="CVV"
                     android:inputType="number"
                     android:maxLength="4"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#7A7A7A"
+                    android:textColor="#FDFDFD"
+                    android:textColorHint="#4DFFFFFF"
                     android:textSize="15sp"/>
             </LinearLayout>
         </LinearLayout>
@@ -232,7 +237,7 @@
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
         android:layout_marginTop="30dp"
-        android:background="@drawable/border_boton_pagar"
+        android:background="@drawable/bg_button_gold"
         android:orientation="horizontal"
         android:gravity="center"
         android:clickable="true"
@@ -244,8 +249,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Confirmar pago"
-            android:textStyle="italic"
-            android:textColor="#E5A93C"
+            android:textColor="#241705"
+            android:textStyle="bold"
             android:textSize="18sp" />
     </LinearLayout>
 

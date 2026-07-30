@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Botón rectangular primario (CTA principal) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="0"
+        android:startColor="#FBDA8E"
+        android:endColor="#F0AA2E" />
+    <corners android:radius="14dp" />
+</shape>

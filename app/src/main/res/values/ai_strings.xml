@@ -4,7 +4,7 @@
         <string name="ai_input_hint">Escribe tu pregunta aqui...</string>
         <string name="ai_send">Enviar</string>
         <string name="ai_loading">Consultando...</string>
-        <string name="ai_greeting">Hola! Soy el asistente de KaaxPark. Puedo responderte sobre ocupacion, clientes, vehiculos, tu estancia actual o historial de visitas. Que deseas saber?</string>
+        <string name="ai_greeting">Hola soy el asistente de KaaxPark. ¿En que te puedo ayudar?</string>
         <string name="ai_error_generic">No se pudo obtener una respuesta.</string>
         <string name="ai_client_greeting">Hola! Soy el asistente de K\'aax Park. Puedo ayudarte con tu estacionamiento, vehiculos, historial de visitas y mas. Que deseas saber?</string>
     </resources>

@@ -19,7 +19,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="15dp"
             android:text="Nombre Usuario"
-            android:textColor="#FFFFFF"
+            android:textColor="#FDFDFD"
             android:textSize="28sp"
             android:textStyle="bold" />
 
@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="ADMIN"
-            android:textColor="@color/gold_primary"
+            android:textColor="#F5C55A"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -39,21 +39,22 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
-            android:background="@drawable/bg_chip_ok"
+            android:background="@drawable/bg_glass_chip"
             android:gravity="center"
             android:paddingHorizontal="15dp"
             android:paddingVertical="6dp"
             android:text="ACTIVO"
-            android:textColor="#2ECC71"
+            android:textColor="#8EE07D"
             android:textStyle="bold" />
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
-            app:cardBackgroundColor="@color/glass_surface"
+            app:cardBackgroundColor="@android:color/transparent"
+            android:background="@drawable/bg_glass_card_gold"
             app:cardCornerRadius="20dp"
-            app:cardElevation="8dp">
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -65,7 +66,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Información Personal"
-                    android:textColor="@color/gold_primary"
+                    android:textColor="#F5C55A"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -74,13 +75,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:text="Correo"
-                    android:textColor="@color/glass_text_muted" />
+                    android:textColor="#8CFFFFFF" />
 
                 <TextView
                     android:id="@+id/txtEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#FDFDFD"
                     android:textSize="16sp" />
 
                 <TextView
@@ -89,13 +90,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:text="Usuario"
-                    android:textColor="@color/glass_text_muted" />
+                    android:textColor="#8CFFFFFF" />
 
                 <TextView
                     android:id="@+id/txtCampoSecundario"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#FDFDFD"
                     android:textSize="16sp" />
 
             </LinearLayout>
@@ -107,9 +108,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            app:cardBackgroundColor="@color/glass_surface"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp">
+            app:cardBackgroundColor="@android:color/transparent"
+            android:background="@drawable/bg_glass_card"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -121,7 +123,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Vehículo Registrado"
-                    android:textColor="@color/gold_primary"
+                    android:textColor="#F5C55A"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -130,7 +132,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#FDFDFD"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -139,14 +141,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#8CFFFFFF" />
 
                 <TextView
                     android:id="@+id/txtPlaca"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#8CFFFFFF" />
 
             </LinearLayout>
 
@@ -155,12 +157,14 @@
         <Button
             android:id="@+id/btnCerrarSesion"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginTop="20dp"
-            android:backgroundTint="#D32F2F"
+            android:background="@drawable/bg_input_glass"
+            android:backgroundTint="@null"
             android:text="Cerrar Sesión"
             android:textAllCaps="false"
-            android:textColor="#FFFFFF"
+            android:textColor="#FF6B6B"
+            android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
 

@@ -39,7 +39,6 @@ abstract class BaseAdminActivity : AppCompatActivity() {
         val btnMenuCajones = findViewById<LinearLayout>(R.id.btnMenuCajones)
         val btnMenuReporte = findViewById<LinearLayout>(R.id.btnMenuReporte)
         val btnMenuSustentabilidad = findViewById<LinearLayout>(R.id.btnMenuSustentabilidad)
-        val btnMenuCentralK = findViewById<CardView>(R.id.btnMenuCentralK)
         val btnInfoUsuario = findViewById<ImageView>(R.id.btnPerfil)
 
         btnMenuDashboard?.setOnClickListener { viajarA(Dashboard::class.java) }
@@ -47,10 +46,6 @@ abstract class BaseAdminActivity : AppCompatActivity() {
         btnMenuReporte?.setOnClickListener { viajarA(Reportes::class.java) }
         btnMenuSustentabilidad?.setOnClickListener { viajarA(Sustentabilidad::class.java) }
         btnInfoUsuario?.setOnClickListener { viajarA(InfoUsuario::class.java) }
-
-        btnMenuCentralK?.setOnClickListener {
-            viajarA(AsistenteIA::class.java)
-        }
     }
 
     protected fun viajarA(destino: Class<*>) {

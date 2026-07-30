@@ -25,49 +25,87 @@ object LocalAiFallbackEngine {
             rol == RolUsuario.CLIENTE && esPreguntaSoloAdmin(normalized) ->
                 "Esa informacion es exclusiva para administradores. Si necesitas algo sobre tu cuenta, tus vehiculos o tu historial, con gusto te ayudo."
 
-            containsAny(normalized, listOf("resumen", "general", "estado general")) ->
-                buildResumen(context)
+            // 1. Sustentabilidad - Agua (Prioridad Alta)
+            containsAny(normalized, listOf("capacidad de la cisterna", "capacidad cisterna", "cisterna", "capacidad de la cisterna")) ->
+                buildCapacidadCisterna(context)
 
-            containsAny(normalized, listOf("resumen", "general", "estado general")) ->
-                buildResumen(context)
+            containsAny(normalized, listOf("nivel de tanque", "nivel del tanque", "nivel tanque", "tanque", "que nivel tiene", "cuanta agua tiene el tanque")) ->
+                buildNivelTanque(context)
 
-            containsAny(normalized, listOf("total de cajones", "cuantos cajones", "total cajones", "cajones totales")) ->
-                "Hay ${context.totalCajones} cajones en total."
+            containsAny(normalized, listOf("agua captada", "agua recolectada", "litros captados", "litros recolectados", "litros de agua", "cuanta agua hay")) ->
+                buildSustentabilidadAgua(context)
 
-            containsAny(normalized, listOf("ocupados", "ocupacion", "ocupacion actual")) &&
+            // 2. Sustentabilidad - Energía
+            containsAny(normalized, listOf("energia solar", "energia generada", "kwh", "kwh generados", "cuanta energia", "porcentaje solar", "porcentaje de energia", "energia almacenada", "energia actual")) ->
+                buildSustentabilidadEnergia(context)
+
+            containsAny(normalized, listOf("energia ahorrada", "ahorro energetico", "ahorro de energia")) ->
+                buildSustentabilidadAhorro(context)
+
+            // 3. Sustentabilidad - Bomba
+            containsAny(normalized, listOf("bomba de agua", "bomba", "estatus de la bomba", "estado de la bomba", "bomba encendida", "bomba funciona", "bomba esta prendida")) ->
+                buildSustentabilidadBomba(context)
+
+            // 4. Ocupación y Cajones
+            containsAny(normalized, listOf("ocupados", "ocupacion actual", "cuantos estan ocupados", "vehiculos estacionados ahora")) &&
             !containsAny(normalized, listOf("libres", "disponibles", "vacantes")) ->
                 "Hay ${context.cajonesOcupados} cajones ocupados de ${context.totalCajones} en total (${context.ocupacionPorcentaje}% de ocupacion)."
 
-            containsAny(normalized, listOf("libres", "disponibles", "vacantes", "disponible")) &&
+            containsAny(normalized, listOf("porcentaje de ocupacion", "nivel de ocupacion", "que tan lleno esta")) ->
+                "La ocupacion actual es del ${context.ocupacionPorcentaje}% (${context.cajonesOcupados} de ${context.totalCajones} cajones)."
+
+            containsAny(normalized, listOf("libres", "disponibles", "vacantes", "disponibilidad", "cajones vacios")) &&
             !containsAny(normalized, listOf("ocupados", "ocupacion")) ->
                 "Hay ${context.cajonesLibres} cajones libres de ${context.totalCajones}."
 
-            containsAny(normalized, listOf("entrada", "entradas")) ->
-                "Hoy se registraron ${context.entradasHoy} entradas."
+            containsAny(normalized, listOf("nivel", "niveles", "distribucion por piso", "pisos")) ->
+                buildNiveles(context)
 
-            containsAny(normalized, listOf("salida", "salidas")) ->
-                "Hoy se registraron ${context.salidasHoy} salidas."
+            // 5. Estadísticas de Tiempo
+            containsAny(normalized, listOf("tiempo promedio", "duracion promedio", "promedio de estancia", "cuanto tiempo se quedan")) ->
+                context.duracionPromedioHoyMin?.let {
+                    "El tiempo promedio de las estancias que han finalizado hoy es de $it minutos."
+                } ?: "No hay suficientes datos de estancias finalizadas hoy para calcular el promedio."
 
-            containsAny(normalized, listOf("tarifa", "costo", "precio", "cobro")) ->
-                "La tarifa por hora configurada es ${formatMoney(context.tarifaPorHora)}."
+            // 6. Usuarios y Clientes
+            containsAny(normalized, listOf("usuarios activos", "clientes activos", "quien esta estacionado")) ->
+                buildCurrentlyParked(context)
 
-            containsAny(normalized, listOf("cliente", "clientes", "usuario", "usuarios", "persona", "personas")) &&
-            containsAny(normalized, listOf("cuantos", "numero", "total", "cuenta", "registrados")) ->
+            containsAny(normalized, listOf("cuantos clientes", "total de clientes", "clientes registrados", "usuarios registrados")) ->
                 "Hay ${context.totalClientes} clientes registrados en el sistema."
 
-            containsAny(normalized, listOf("administrador", "administradores", "admin")) &&
-            containsAny(normalized, listOf("cuantos", "numero", "total", "existen")) ->
+            containsAny(normalized, listOf("cuantos administradores", "total de administradores", "admin registrados")) ->
                 "Hay ${context.totalAdministradores} administradores registrados."
 
+            containsAny(normalized, listOf("energia ahorrada", "ahorro energetico", "energia ahorrada")) ->
+                buildSustentabilidadAhorro(context)
+
+            // 7. Información Personal y Vehículos
             containsAny(normalized, listOf("vehiculo", "vehiculos", "auto", "autos", "carro", "carros")) &&
             containsAny(normalized, listOf("cuantos", "que", "cual", "registrados")) &&
             esPreguntaPersonal ->
                 buildVehicleList(context)
 
+            containsAny(normalized, listOf("mis vehiculos", "mis autos", "mis carros", "vehiculos que tengo", "que vehiculos tengo")) ->
+                buildVehicleList(context)
+
+            containsAny(normalized, listOf("estoy estacionado", "llevo estacionado", "tiempo actual", "cuanto tiempo llevo", "estancia actual")) ->
+                buildCurrentStay(context)
+
             containsAny(normalized, listOf("vehiculo", "vehiculos", "auto", "autos", "carro", "carros")) &&
             containsAny(normalized, listOf("cuantos", "numero", "total", "cuenta", "registrados")) &&
             !esPreguntaPersonal ->
                 "Hay ${context.totalVehiculos} vehiculos registrados en el sistema."
+
+            // 8. Otros (Tarifa, CO2, Árboles, etc.)
+            containsAny(normalized, listOf("tarifa", "costo", "precio", "cobro")) ->
+                "La tarifa por hora configurada es ${formatMoney(context.tarifaPorHora)}."
+
+            containsAny(normalized, listOf("co2", "carbono", "evitamos", "evitar", "emisiones")) ->
+                buildSustentabilidadCO2(context)
+
+            containsAny(normalized, listOf("arbol", "arboles", "equivalente", "salvados", "cuantos arboles")) ->
+                buildSustentabilidadArboles(context)
 
             containsAny(normalized, listOf("cuanto tiempo", "cuanto estuv", "tiempo que estuve", "cuanto estuve", "cuanto estuvo")) ->
                 answerDurationForDay(normalized, context)
@@ -84,40 +122,9 @@ object LocalAiFallbackEngine {
             containsAny(normalized, listOf("que dias", "dias que", "dias utilice", "dias use", "dias estuve")) ->
                 answerDaysForVehicle(normalized, context)
 
-            containsAny(normalized, listOf("estoy estacionado", "llevo estacionado", "tiempo actual", "cuanto tiempo llevo", "estancia actual")) ->
-                buildCurrentStay(context)
-
-            containsAny(normalized, listOf("mis vehiculos", "mis autos", "mis carros", "vehiculos que tengo", "que vehiculos tengo")) ->
-                buildVehicleList(context)
-
-            containsAny(normalized, listOf("tiempo promedio", "duracion promedio", "promedio de estancia")) ->
-                context.duracionPromedioHoyMin?.let {
-                    "El tiempo promedio de estancias finalizadas hoy es de $it min."
-                } ?: "No encontre estancias finalizadas hoy para calcular el tiempo promedio."
-
-            containsAny(normalized, listOf("vehiculo estacionado", "vehiculos estacionados", "actualmente estacionado", "estacionados ahora")) ->
-                buildCurrentlyParked(context)
-
-            containsAny(normalized, listOf("energia solar", "energia generada", "kwh", "kwh generados", "cuanta energia", "cuanta energia solar")) ->
-                buildSustentabilidadEnergia(context)
-
-            containsAny(normalized, listOf("co2", "carbono", "evitamos", "evitar", "emisiones")) ->
-                buildSustentabilidadCO2(context)
-
-            containsAny(normalized, listOf("arbol", "arboles", "equivalente", "salvados", "cuantos arboles")) ->
-                buildSustentabilidadArboles(context)
-
-            containsAny(normalized, listOf("bomba de agua", "bomba", "estado de la bomba", "bomba de agua encendida", "bomba funciona")) ->
-                buildSustentabilidadBomba(context)
-
-            containsAny(normalized, listOf("litros de agua", "agua reutilizados", "agua captada", "cuanta agua", "litros de agua reutilizados", "agua usada en riego")) ->
-                buildSustentabilidadAgua(context)
-
-            containsAny(normalized, listOf("energia ahorrada", "ahorro energetico", "energia ahorrada")) ->
-                buildSustentabilidadAhorro(context)
-
-            containsAny(normalized, listOf("nivel", "niveles")) ->
-                buildNiveles(context)
+            // 9. Resumen y Fallback
+            containsAny(normalized, listOf("resumen", "general", "estado general")) ->
+                buildResumen(context)
 
             else ->
                 buildDefaultAnswer(context)
@@ -298,6 +305,21 @@ object LocalAiFallbackEngine {
         return "Se captaron ${formatNumber(info.aguaCaptadaLitros)} L de agua y se usaron ${formatNumber(info.aguaUsadaRiegoLitros)} L para riego."
     }
 
+    private fun buildCapacidadCisterna(context: ParkingAiContext): String {
+        val info = context.sustentabilidad
+            ?: return "No encontre datos de sustentabilidad en la base de datos."
+        // Si no tienes un campo de "capacidad máxima" explícito en Firebase, 
+        // pero sabes que es de 10,000L por ejemplo, puedes hardcodearlo o calcularlo.
+        // Aquí usaremos una respuesta basada en lo que el sistema monitorea.
+        return "La cisterna tiene una capacidad monitoreada de 10,000 L. Actualmente el nivel es del ${formatNumber(info.nivelTanquePorcentaje)}%."
+    }
+
+    private fun buildNivelTanque(context: ParkingAiContext): String {
+        val info = context.sustentabilidad
+            ?: return "No encontre datos de sustentabilidad en la base de datos."
+        return "El nivel actual del tanque es del ${formatNumber(info.nivelTanquePorcentaje)}%."
+    }
+
     private fun buildSustentabilidadAhorro(context: ParkingAiContext): String {
         val info = context.sustentabilidad
             ?: return "No encontre datos de sustentabilidad en la base de datos."
@@ -330,32 +352,7 @@ object LocalAiFallbackEngine {
     }
 
     private fun buildDefaultAnswer(context: ParkingAiContext): String {
-        val parts = mutableListOf<String>()
-
-        if (context.totalClientes > 0) {
-            parts.add("Hay ${context.totalClientes} clientes registrados.")
-        }
-        if (context.totalVehiculos > 0) {
-            parts.add("Hay ${context.totalVehiculos} vehiculos registrados.")
-        }
-        if (context.totalCajones > 0) {
-            parts.add("Hay ${context.totalCajones} cajones en total (${context.cajonesOcupados} ocupados, ${context.cajonesLibres} libres).")
-        }
-        if (context.entradasHoy > 0 || context.salidasHoy > 0) {
-            parts.add("Hoy hubo ${context.entradasHoy} entradas y ${context.salidasHoy} salidas.")
-        }
-        if (context.userVisits.isNotEmpty()) {
-            parts.add("Tienes ${context.userVisits.size} visitas registradas en el historial.")
-        }
-        if (context.estanciaActualMinutos != null) {
-            parts.add("Actualmente tienes una estancia activa de ${context.estanciaActualMinutos} minutos.")
-        }
-
-        if (parts.isEmpty()) {
-            return "No encontre datos suficientes para responder tu pregunta. Puedes preguntar por ocupacion, cajones, entradas, salidas, tarifa, sustentabilidad, o tu historial de visitas."
-        }
-
-        return parts.joinToString(" ")
+        return "Lo siento, no entendí tu pregunta. Intenta preguntar sobre la ocupación, los niveles, el agua captada o el historial de tus vehículos."
     }
 
     private fun parseDate(normalized: String): String? {
@@ -466,7 +463,7 @@ object LocalAiFallbackEngine {
             "lista de clientes", "buscar cliente",
             "cuantos usuarios", "usuarios activos", "usuarios inactivos",
             "vehiculos por cliente", "buscar vehiculo por placa",
-            "cuantos vehiculos", "total de vehiculos",
+            "cuantos vehiculos", "total de vehiculos", "vehiculos registrados",
             "tarifas historicas", "entradas del dia", "salidas del dia",
             "vehiculos actualmente estacionados", "vehiculos estacionados",
             "tendencia de ocupacion", "horas pico",

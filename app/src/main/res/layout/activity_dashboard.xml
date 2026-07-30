@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Panel de Administración"
-            android:textColor="#FFFFFF"
+            android:textColor="#FDFDFD"
             android:textSize="22sp"
             android:textStyle="bold" />
 
@@ -30,16 +30,17 @@
             android:layout_marginTop="2dp"
             android:layout_marginBottom="16dp"
             android:text="Resumen general del sistema."
-            android:textColor="#A0A0A0"
+            android:textColor="#8CFFFFFF"
             android:textSize="14sp"
             android:textStyle="italic" />
 
+        <!-- Asistente IA -->
         <LinearLayout
             android:id="@+id/btnAsistenteIA"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_boton_generar"
+            android:background="@drawable/bg_glass_card_gold"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
@@ -50,10 +51,10 @@
             <TextView
                 android:layout_width="52dp"
                 android:layout_height="52dp"
-                android:background="@drawable/bg_boton_dorado_solido"
+                android:background="@drawable/bg_fab_gold"
                 android:gravity="center"
                 android:text="IA"
-                android:textColor="#111111"
+                android:textColor="#241705"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -68,7 +69,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Asistente IA"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#FDFDFD"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -77,7 +78,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="Consulta datos reales del estacionamiento"
-                    android:textColor="#A0A0A0"
+                    android:textColor="#8CFFFFFF"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -85,257 +86,208 @@
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:src="@drawable/icon_flecha_derecha"
-                android:tint="#D4A017" />
+                app:tint="#F5C55A" />
         </LinearLayout>
 
-        <!-- ── Grid 2×2 de stat cards ─────────────────────────────────────── -->
+        <!-- Stat Cards Grid -->
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:columnCount="2"
-            android:rowCount="2"
-            android:alignmentMode="alignBounds"
-            android:columnOrderPreserved="false">
+            android:alignmentMode="alignMargins"
+            android:columnOrderPreserved="false"
+            android:layout_marginBottom="16dp">
 
             <!-- Entradas Hoy -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="130dp"
+                android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="6dp"
-                app:cardBackgroundColor="@color/glass_surface"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="8dp">
-                <androidx.constraintlayout.widget.ConstraintLayout
+                app:cardElevation="0dp">
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="14dp">
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="16dp">
                     <TextView
-                        android:id="@+id/titleEntradas"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Entradas Hoy"
-                        android:textColor="#B0B5B8"
-                        android:textSize="13sp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        android:textColor="#8CFFFFFF"
+                        android:textSize="12sp" />
                     <TextView
                         android:id="@+id/numEntradas"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="—"
-                        android:textColor="#FFFFFF"
-                        android:textSize="40sp"
-                        android:textStyle="bold"
-                        app:layout_constraintTop_toBottomOf="@id/titleEntradas"
-                        app:layout_constraintStart_toStartOf="parent" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="↑"
-                        android:textColor="#4CAF50"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        android:layout_marginTop="4dp"
+                        android:text="0"
+                        android:textColor="#FDFDFD"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <!-- Salidas Hoy -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="130dp"
+                android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="6dp"
-                app:cardBackgroundColor="@color/glass_surface"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="8dp">
-                <androidx.constraintlayout.widget.ConstraintLayout
+                app:cardElevation="0dp">
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="14dp">
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="16dp">
                     <TextView
-                        android:id="@+id/titleSalidas"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Salidas Hoy"
-                        android:textColor="#B0B5B8"
-                        android:textSize="13sp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        android:textColor="#8CFFFFFF"
+                        android:textSize="12sp" />
                     <TextView
                         android:id="@+id/numSalidas"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="—"
-                        android:textColor="#FFFFFF"
-                        android:textSize="40sp"
-                        android:textStyle="bold"
-                        app:layout_constraintTop_toBottomOf="@id/titleSalidas"
-                        app:layout_constraintStart_toStartOf="parent" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="↓"
-                        android:textColor="#F44336"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        android:layout_marginTop="4dp"
+                        android:text="0"
+                        android:textColor="#FDFDFD"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <!-- Ocupación -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="130dp"
+                android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="6dp"
-                app:cardBackgroundColor="@color/glass_surface"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="8dp">
-                <androidx.constraintlayout.widget.ConstraintLayout
+                app:cardElevation="0dp">
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="14dp">
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="16dp">
                     <TextView
-                        android:id="@+id/titleOcupacion"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Ocupación"
-                        android:textColor="#B0B5B8"
-                        android:textSize="13sp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        android:textColor="#8CFFFFFF"
+                        android:textSize="12sp" />
                     <TextView
                         android:id="@+id/numOcupacion"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="—"
-                        android:textColor="#C9A227"
-                        android:textSize="36sp"
-                        android:textStyle="bold"
-                        app:layout_constraintTop_toBottomOf="@id/titleOcupacion"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        android:layout_marginTop="4dp"
+                        android:text="0%"
+                        android:textColor="#FDFDFD"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <!-- Tiempo Promedio -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="130dp"
+                android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="6dp"
-                app:cardBackgroundColor="@color/glass_surface"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="8dp">
-                <androidx.constraintlayout.widget.ConstraintLayout
+                app:cardElevation="0dp">
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="14dp">
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="16dp">
                     <TextView
-                        android:id="@+id/titleTiempo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tiempo promedio"
-                        android:textColor="#B0B5B8"
-                        android:textSize="12sp"
-                        android:textStyle="italic"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        android:text="Tiempo Promedio"
+                        android:textColor="#8CFFFFFF"
+                        android:textSize="12sp" />
                     <TextView
                         android:id="@+id/numTiempo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="—"
-                        android:textColor="#FFFFFF"
-                        android:textSize="26sp"
-                        android:textStyle="bold"
-                        app:layout_constraintTop_toBottomOf="@id/titleTiempo"
-                        app:layout_constraintStart_toStartOf="parent" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="estancias completadas hoy"
-                        android:textColor="#777777"
-                        android:textSize="10sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        android:textColor="#FDFDFD"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
         </GridLayout>
 
-        <!-- ── Gráfica de ocupación por hora ──────────────────────────────── -->
+        <!-- Chart Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:cardBackgroundColor="@color/glass_surface"
+            android:layout_height="250dp"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@android:color/transparent"
             app:cardCornerRadius="16dp"
-            app:cardElevation="8dp">
-
+            app:cardElevation="0dp">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="vertical"
                 android:padding="16dp">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ocupación Por Hora"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="12dp" />
-
+                    android:text="Ocupación por Hora"
+                    android:textColor="#FDFDFD"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/lineChart"
                     android:layout_width="match_parent"
-                    android:layout_height="190dp" />
-
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- ── Actividad Reciente ──────────────────────────────────────────── -->
+        <!-- Recent Activity Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@color/glass_surface"
+            app:cardBackgroundColor="@android:color/transparent"
             app:cardCornerRadius="16dp"
-            app:cardElevation="8dp">
-
+            app:cardElevation="0dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="vertical"
                 android:padding="16dp">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Actividad Reciente"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:textColor="#FDFDFD"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="4dp" />
-
-                <!-- Las filas de actividad se agregan aquí programáticamente -->
+                    android:layout_marginBottom="8dp"/>
                 <LinearLayout
                     android:id="@+id/contenedorActividad"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
-
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

@@ -14,9 +14,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="68dp"
         android:text="Mi Estancia"
-        android:textColor="#FFFFFF"
+        android:textColor="#FDFDFD"
         android:textSize="22sp"
-        android:textStyle="italic"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,9 +29,8 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="32dp"
         android:text="Tu vehículo está estacionado"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp"
-        android:textStyle="italic"
+        android:textColor="#8CFFFFFF"
+        android:textSize="16sp"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -44,7 +43,7 @@
         android:layout_marginStart="25dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="25dp"
-        android:background="@drawable/bg_timer_estancia"
+        android:background="@drawable/bg_glass_card_gold"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:paddingTop="20dp"
@@ -55,9 +54,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tiempo estacionado"
-            android:textColor="#DDDDDD"
-            android:textStyle="italic"
-            android:textSize="18sp" />
+            android:textColor="#8CFFFFFF"
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/txtTiempoMarcador"
@@ -65,8 +63,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="02:45:18"
-            android:textColor="#FFFFFF"
+            android:textColor="#F5C55A"
             android:textSize="48sp"
+            android:textStyle="bold"
             android:letterSpacing="0.05" />
 
         <LinearLayout
@@ -83,8 +82,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Horas"
-                android:textStyle="italic"
-                android:textColor="#CCCCCC"
+                android:textColor="#8CFFFFFF"
                 android:textSize="13sp" />
 
             <TextView
@@ -93,8 +91,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Minutos"
-                android:textStyle="italic"
-                android:textColor="#CCCCCC"
+                android:textColor="#8CFFFFFF"
                 android:textSize="13sp" />
 
             <TextView
@@ -103,8 +100,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Segundos"
-                android:textStyle="italic"
-                android:textColor="#CCCCCC"
+                android:textColor="#8CFFFFFF"
                 android:textSize="13sp" />
         </LinearLayout>
     </LinearLayout>
@@ -114,11 +110,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="25dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="25dp"
-        android:background="@drawable/border_detalle_estancia"
+        android:background="@drawable/bg_glass_card"
         android:orientation="vertical"
-        android:padding="1dp"
+        android:padding="4dp"
         app:layout_constraintTop_toBottomOf="@id/containerCronometro">
 
         <RelativeLayout
@@ -131,7 +127,8 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/icon_lugar" />
+                android:src="@drawable/icon_lugar"
+                app:tint="#F5C55A" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -139,7 +136,7 @@
                 android:layout_marginStart="15dp"
                 android:layout_centerVertical="true"
                 android:text="Lugar asignado"
-                android:textColor="#FFFFFF"
+                android:textColor="#FDFDFD"
                 android:textSize="15sp" />
             <TextView
                 android:id="@+id/txtDetalleLugar"
@@ -148,11 +145,12 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:text="n1c1"
-                android:textColor="#E5A93C"
-                android:textSize="15sp" />
+                android:textColor="#F5C55A"
+                android:textSize="15sp"
+                android:textStyle="bold" />
         </RelativeLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#444444" />
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#1AFFFFFF" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -164,7 +162,8 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/icon_vehiculo" />
+                android:src="@drawable/icon_vehiculo"
+                app:tint="#F5C55A" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -172,7 +171,7 @@
                 android:layout_marginStart="15dp"
                 android:layout_centerVertical="true"
                 android:text="Vehículo"
-                android:textColor="#FFFFFF"
+                android:textColor="#FDFDFD"
                 android:textSize="15sp" />
             <TextView
                 android:id="@+id/txtDetalleMarca"
@@ -181,11 +180,12 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:text="Toyota"
-                android:textColor="#E5A93C"
-                android:textSize="15sp" />
+                android:textColor="#F5C55A"
+                android:textSize="15sp"
+                android:textStyle="bold" />
         </RelativeLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#444444" />
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#1AFFFFFF" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -193,19 +193,20 @@
             android:paddingHorizontal="15dp"
             android:gravity="center_vertical">
             <ImageView
-                android:id="@+id/ic稳Placa"
+                android:id="@+id/icPlaca"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/icon_placa" />
+                android:src="@drawable/icon_placa"
+                app:tint="#F5C55A" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/ic稳Placa"
+                android:layout_toEndOf="@id/icPlaca"
                 android:layout_marginStart="15dp"
                 android:layout_centerVertical="true"
                 android:text="Placa"
-                android:textColor="#FFFFFF"
+                android:textColor="#FDFDFD"
                 android:textSize="15sp" />
             <TextView
                 android:id="@+id/txtDetallePlaca"
@@ -214,11 +215,12 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:text="YUC-123-A"
-                android:textColor="#E5A93C"
-                android:textSize="15sp" />
+                android:textColor="#F5C55A"
+                android:textSize="15sp"
+                android:textStyle="bold" />
         </RelativeLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#444444" />
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#1AFFFFFF" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -230,7 +232,8 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/icon_color" />
+                android:src="@drawable/icon_color"
+                app:tint="#F5C55A" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -238,7 +241,7 @@
                 android:layout_marginStart="15dp"
                 android:layout_centerVertical="true"
                 android:text="Color"
-                android:textColor="#FFFFFF"
+                android:textColor="#FDFDFD"
                 android:textSize="15sp" />
             <TextView
                 android:id="@+id/txtDetalleColor"
@@ -247,8 +250,9 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:text="Gris"
-                android:textColor="#E5A93C"
-                android:textSize="15sp" />
+                android:textColor="#F5C55A"
+                android:textSize="15sp"
+                android:textStyle="bold" />
         </RelativeLayout>
     </LinearLayout>
 
@@ -259,7 +263,7 @@
         android:layout_marginStart="40dp"
         android:layout_marginTop="25dp"
         android:layout_marginEnd="40dp"
-        android:background="@drawable/border_boton_actualizar"
+        android:background="@drawable/bg_button_gold"
         android:orientation="horizontal"
         android:gravity="center"
         android:clickable="true"
@@ -270,14 +274,15 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:layout_marginEnd="10dp"
-            android:src="@drawable/icon_actualizar" />
+            android:src="@drawable/icon_actualizar"
+            app:tint="#241705" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Actualizar"
-            android:textStyle="italic"
-            android:textColor="#E5A93C"
+            android:textColor="#241705"
+            android:textStyle="bold"
             android:textSize="17sp" />
     </LinearLayout>
 

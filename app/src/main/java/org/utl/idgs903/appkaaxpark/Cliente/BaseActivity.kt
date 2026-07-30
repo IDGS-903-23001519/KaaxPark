@@ -55,7 +55,6 @@ abstract class BaseActivity : AppCompatActivity() {
         val btnMenuPago = findViewById<LinearLayout>(R.id.btnMenuPago)
         val btnInfoUsuario = findViewById<ImageView>(R.id.btnPerfil)
         val btnVehiculos = findViewById<CardView>(R.id.btnVehiculos)
-        val btnAsistenteIA = findViewById<LinearLayout>(R.id.btnAsistenteIA)
 
         btnMenuEstancia?.setOnClickListener { viajarA(EstanciaVehiculo::class.java) }
         btnMenuHistorial?.setOnClickListener { viajarA(HistorialVisitas::class.java) }
@@ -64,7 +63,6 @@ abstract class BaseActivity : AppCompatActivity() {
         btnMenuPago?.setOnClickListener { viajarA(DetallePago::class.java) }
         btnInfoUsuario?.setOnClickListener { viajarA(InfoUsuario::class.java) }
         btnVehiculos?.setOnClickListener { viajarA(MisVehiculos::class.java) }
-        btnAsistenteIA?.setOnClickListener { viajarA(ClienteAsistenteIA::class.java) }
     }
 
     private fun actualizarEstadoMenuNavegacion() {
@@ -96,9 +94,8 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun viajarA(destino: Class<*>) {
         val esHistorial = destino == HistorialVisitas::class.java
         val esPerfil = destino == InfoUsuario::class.java
-        val esAsistenteIA = destino == ClienteAsistenteIA::class.java
 
-        if (navegacionBloqueada && !esHistorial && !esPerfil && !esAsistenteIA) {
+        if (navegacionBloqueada && !esHistorial && !esPerfil) {
             Toast.makeText(
                 this,
                 "Escanea el codigo QR de entrada para continuar.",

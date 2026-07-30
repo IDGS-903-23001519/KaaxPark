@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_screen_glass">
 
+    <!-- Header / Barra Superior -->
     <ImageView
         android:id="@+id/btnPerfil"
         android:layout_width="35dp"
@@ -20,6 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <FrameLayout
         android:id="@+id/containerDashboard"
         android:layout_width="0dp"
@@ -30,18 +32,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- Barra de Navegación Inferior -->
     <LinearLayout
         android:id="@+id/menuInferiorAdmin"
         android:layout_width="0dp"
-        android:layout_height="95dp"
+        android:layout_height="80dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="12dp"
-        android:paddingBottom="10dp"
-        android:background="@drawable/bg_bottom_nav"
-        android:elevation="12dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_bottom_nav_glass"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -49,116 +50,138 @@
         <LinearLayout
             android:id="@+id/btnMenuDashboard"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingTop="8dp">
             <ImageView
                 android:id="@+id/imgNavDashboard"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/icon_dashboard"/>
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/icon_dashboard"
+                app:tint="#8CFFFFFF" />
             <TextView
                 android:id="@+id/txtNavDashboard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Dashboard"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp"/>
+                android:textColor="#8CFFFFFF"
+                android:textSize="10sp"/>
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/btnMenuCajones"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingTop="8dp">
             <ImageView
                 android:id="@+id/imgNavCajones"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/icon_cajones"/>
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/icon_cajones"
+                app:tint="#8CFFFFFF" />
             <TextView
                 android:id="@+id/txtNavCajones"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Cajones"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp"/>
+                android:textColor="#8CFFFFFF"
+                android:textSize="10sp"/>
         </LinearLayout>
 
+        <!-- Botón Central - Logo de la App -->
         <LinearLayout
-            android:layout_width="85dp"
-            android:layout_height="85dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
             android:gravity="center"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:orientation="vertical">
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnMenuCentralK"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="Abrir asistente IA"
-                app:cardCornerRadius="35dp"
-                app:cardBackgroundColor="@color/gold_primary"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="32dp"
                 app:cardElevation="10dp">
-                <ImageView
-                    android:layout_width="60dp"
-                    android:layout_height="52dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/logo" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_fab_gold"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/logo"
+                        app:tint="#241705" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/btnMenuReporte"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingTop="8dp">
             <ImageView
                 android:id="@+id/imgNavReporte"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/icon_reporte"/>
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/icon_reporte"
+                app:tint="#8CFFFFFF" />
             <TextView
                 android:id="@+id/txtNavReporte"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Reporte"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp"/>
+                android:textColor="#8CFFFFFF"
+                android:textSize="10sp"/>
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/btnMenuSustentabilidad"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingTop="8dp">
             <ImageView
                 android:id="@+id/imgNavSustentabilidad"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/icon_sustentabilidad"/>
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/icon_sustentabilidad"
+                app:tint="#8CFFFFFF" />
             <TextView
                 android:id="@+id/txtNavSustentabilidad"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Sustentabilidad"
-                android:textColor="#FFFFFF"
-                android:textSize="10sp"/>
+                android:textColor="#8CFFFFFF"
+                android:textSize="9sp"/>
         </LinearLayout>
 
     </LinearLayout>

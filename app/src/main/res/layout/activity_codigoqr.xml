@@ -29,11 +29,11 @@
                 android:id="@+id/txtTitulo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="68dp"
-                android:text="Escanear Código QR"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="italic" />
+                android:layout_marginTop="100dp"
+                android:text="Escanear código"
+                android:textColor="#F5C55A"
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
             <!-- Paso 1: escanear el código QR de la entrada -->
             <LinearLayout
@@ -46,53 +46,58 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="35dp"
+                    android:layout_marginTop="12dp"
                     android:layout_marginHorizontal="40dp"
                     android:gravity="center"
-                    android:text="Escanea el código Qr en la\npantalla de entrada"
-                    android:textColor="#E0E0E0"
-                    android:textSize="16sp"
-                    android:textStyle="italic" />
+                    android:text="Apunta con la cámara al código QR de la entrada"
+                    android:textColor="#8CFFFFFF"
+                    android:textSize="14sp" />
 
+                <!-- Tarjeta de vidrio que envuelve la cámara, con borde dorado -->
                 <FrameLayout
                     android:id="@+id/contenedorCamara"
-                    android:layout_width="280dp"
-                    android:layout_height="280dp"
-                    android:layout_marginTop="35dp"
-                    android:background="@drawable/bg_dialog"
-                    android:elevation="4dp">
+                    android:layout_width="300dp"
+                    android:layout_height="300dp"
+                    android:layout_marginTop="40dp"
+                    android:padding="18dp"
+                    android:background="@drawable/bg_glass_card_gold"
+                    android:elevation="0dp">
 
                     <LinearLayout
                         android:id="@+id/btnIniciarEscaneo"
-                        android:layout_width="244dp"
-                        android:layout_height="246dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:layout_gravity="center"
+                        android:background="#4D000000"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
                         android:orientation="vertical">
 
                         <ImageView
-                            android:layout_width="244dp"
-                            android:layout_height="195dp"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:alpha="0.25"
                             android:src="@drawable/icon_codigoqr" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Toca para escanear"
-                            android:textColor="#D4A017"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
                     </LinearLayout>
 
+                    <!-- Marco de esquinas doradas -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@drawable/marcador_qr" />
 
+                    <!-- Línea de escaneo animada -->
+                    <View
+                        android:id="@+id/lineaEscaneo"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/bg_scan_line" />
+
                 </FrameLayout>
+
 
             </LinearLayout>
 
@@ -101,26 +106,26 @@
                 android:id="@+id/contenedorSeleccionVehiculo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginHorizontal="24dp"
+                android:padding="16dp"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="vertical"
                 android:visibility="gone">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginHorizontal="30dp"
                     android:gravity="center"
                     android:text="Código válido. Selecciona el vehículo\ncon el que vienes"
                     android:textColor="#E0E0E0"
-                    android:textSize="16sp"
-                    android:textStyle="italic" />
+                    android:textSize="15sp" />
 
                 <LinearLayout
                     android:id="@+id/contenedorVehiculosQR"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="16dp"
                     android:orientation="vertical" />
 
                 <TextView
@@ -129,9 +134,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="‹ Volver a escanear el código"
-                    android:textColor="#D4A017"
+                    android:textColor="#F5C55A"
                     android:textSize="13sp"
-                    android:textStyle="bold"
                     android:clickable="true"
                     android:focusable="true"
                     android:padding="10dp" />
@@ -146,7 +150,7 @@
                 android:layout_marginHorizontal="30dp"
                 android:gravity="center"
                 android:text=""
-                android:textColor="#D4A017"
+                android:textColor="#F5C55A"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
