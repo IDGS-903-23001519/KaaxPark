@@ -55,7 +55,7 @@ class ParkingAiAssistantRepository(
     }
 
     constructor(userDocId: String, rol: RolUsuario) : this(
-        contextProvider = ParkingAiContextProvider(userDocId = userDocId),
+        contextProvider = ParkingAiContextProvider(userDocId = userDocId, rol = rol),
         remoteClient = RemoteAiAnswerClient(),
         rol = rol
     )

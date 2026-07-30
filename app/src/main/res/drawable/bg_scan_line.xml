@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Barra horizontal con degradado hacia los bordes para simular el "glow" del láser -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="0"
+        android:startColor="#00F5C55A"
+        android:centerColor="#CCF5C55A"
+        android:endColor="#00F5C55A" />
+    <size android:height="2dp" />
+</shape>

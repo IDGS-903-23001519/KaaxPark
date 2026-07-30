@@ -1,30 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Vector drawable: 4 esquinas tipo "bracket" doradas sobre un lienzo de 244x246dp -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="280dp"
-    android:height="280dp"
-    android:viewportWidth="280"
-    android:viewportHeight="280">
+    android:width="244dp"
+    android:height="246dp"
+    android:viewportWidth="244"
+    android:viewportHeight="246">
 
+    <!-- Esquina superior izquierda -->
     <path
-        android:strokeColor="#D4A017"
+        android:pathData="M4,40 L4,10 A6,6 0 0,1 10,4 L40,4"
+        android:strokeColor="#F5C55A"
         android:strokeWidth="4"
         android:strokeLineCap="round"
-        android:pathData="M 4,30 L 4,4 C 4,4 4,4 4,4 L 30,4" />
+        android:fillColor="#00000000" />
 
+    <!-- Esquina superior derecha -->
     <path
-        android:strokeColor="#D4A017"
+        android:pathData="M204,4 L234,4 A6,6 0 0,1 240,10 L240,40"
+        android:strokeColor="#F5C55A"
         android:strokeWidth="4"
         android:strokeLineCap="round"
-        android:pathData="M 250,4 L 276,4 C 276,4 276,4 276,4 L 276,30" />
+        android:fillColor="#00000000" />
 
+    <!-- Esquina inferior izquierda -->
     <path
-        android:strokeColor="#D4A017"
+        android:pathData="M4,206 L4,236 A6,6 0 0,0 10,242 L40,242"
+        android:strokeColor="#F5C55A"
         android:strokeWidth="4"
         android:strokeLineCap="round"
-        android:pathData="M 4,250 L 4,276 C 4,276 4,276 4,276 L 30,276" />
+        android:fillColor="#00000000" />
 
+    <!-- Esquina inferior derecha -->
     <path
-        android:strokeColor="#D4A017"
+        android:pathData="M204,242 L234,242 A6,6 0 0,0 240,236 L240,206"
+        android:strokeColor="#F5C55A"
         android:strokeWidth="4"
         android:strokeLineCap="round"
-        android:pathData="M 276,250 L 276,276 C 276,276 276,276 276,276 L 250,276" />
+        android:fillColor="#00000000" />
+
 </vector>

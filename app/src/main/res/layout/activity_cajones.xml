@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
         android:text="Gestión de cajones"
-        android:textColor="#FFFFFF"
+        android:textColor="#FDFDFD"
         android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:text="Monitorea y controla los cajones"
-        android:textColor="#A0A0A0"
+        android:textColor="#8CFFFFFF"
         android:textSize="13sp"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,10 +41,10 @@
         android:layout_height="46dp"
         android:layout_marginTop="18dp"
         android:layout_marginEnd="12dp"
-        android:background="@drawable/bg_buscador_cajones"
+        android:background="@drawable/bg_input_glass"
         android:hint="Buscar cajón..."
-        android:textColorHint="#666666"
-        android:textColor="#FFFFFF"
+        android:textColorHint="#4DFFFFFF"
+        android:textColor="#FDFDFD"
         android:paddingStart="40dp"
         android:paddingEnd="16dp"
         android:textSize="14sp"
@@ -61,18 +61,18 @@
         app:layout_constraintBottom_toBottomOf="@id/txtBuscarCajon"
         app:layout_constraintStart_toStartOf="@id/txtBuscarCajon"
         app:layout_constraintTop_toTopOf="@id/txtBuscarCajon"
-        app:tint="#666666" />
+        app:tint="#8CFFFFFF" />
 
     <ImageButton
         android:id="@+id/btnFiltro"
         android:layout_width="54dp"
         android:layout_height="46dp"
-        android:background="@drawable/bg_filtro_cajones"
+        android:background="@drawable/bg_glass_chip"
         android:src="@drawable/icon_filtro"
         app:layout_constraintBottom_toBottomOf="@id/txtBuscarCajon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/txtBuscarCajon"
-        app:tint="#FFFFFF" />
+        app:tint="#8CFFFFFF" />
 
     <LinearLayout
         android:id="@+id/layoutContadores"
@@ -87,8 +87,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginEnd="6dp"
-            app:cardBackgroundColor="@color/glass_surface"
-            app:cardCornerRadius="16dp">
+            app:cardBackgroundColor="@android:color/transparent"
+            android:background="@drawable/bg_glass_card"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp">
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -98,7 +100,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Total"
-                    android:textColor="#B0B5B8"
+                    android:textColor="#8CFFFFFF"
                     android:textSize="12sp" />
                 <TextView
                     android:id="@+id/txtTotalCajones"
@@ -106,7 +108,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/lblTotalTag"
                     android:text="0"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#FDFDFD"
                     android:textSize="28sp"
                     android:textStyle="bold"/>
             </RelativeLayout>
@@ -117,8 +119,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginHorizontal="3dp"
-            app:cardBackgroundColor="@color/glass_surface"
-            app:cardCornerRadius="16dp">
+            app:cardBackgroundColor="@android:color/transparent"
+            android:background="@drawable/bg_glass_card"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp">
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -128,7 +132,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Ocupados"
-                    android:textColor="#B0B5B8"
+                    android:textColor="#8CFFFFFF"
                     android:textSize="12sp" />
                 <TextView
                     android:id="@+id/txtOcupadosCajones"
@@ -136,7 +140,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/lblOcupadosTag"
                     android:text="0"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#F5C55A"
                     android:textSize="28sp"
                     android:textStyle="bold" />
                 <TextView
@@ -146,7 +150,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
                     android:text="0%"
-                    android:textColor="#B0B5B8"
+                    android:textColor="#8CFFFFFF"
                     android:textSize="11sp" />
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
@@ -156,8 +160,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginStart="6dp"
-            app:cardBackgroundColor="@color/glass_surface"
-            app:cardCornerRadius="16dp">
+            app:cardBackgroundColor="@android:color/transparent"
+            android:background="@drawable/bg_glass_card"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp">
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -167,7 +173,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Disponibles"
-                    android:textColor="#B0B5B8"
+                    android:textColor="#8CFFFFFF"
                     android:textSize="12sp" />
                 <TextView
                     android:id="@+id/txtDisponiblesCajones"
@@ -175,7 +181,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/lblDisponiblesTag"
                     android:text="0"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#8EE07D"
                     android:textSize="28sp"
                     android:textStyle="bold"/>
                 <TextView
@@ -185,7 +191,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
                     android:text="0%"
-                    android:textColor="#B0B5B8"
+                    android:textColor="#8CFFFFFF"
                     android:textSize="11sp" />
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
@@ -213,8 +219,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="No se encontraron cajones."
-        android:textColor="#9E9E9E"
-        android:textSize="13sp"
+        android:textColor="#4DFFFFFF"
+        android:textSize="14sp"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/layoutContadores"
         app:layout_constraintStart_toStartOf="parent"

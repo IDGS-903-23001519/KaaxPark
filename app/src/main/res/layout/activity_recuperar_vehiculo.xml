@@ -65,7 +65,7 @@
         android:layout_width="320dp"
         android:layout_height="55dp"
         android:layout_marginTop="20dp"
-        android:background="@drawable/borde_dorado"
+        android:background="@drawable/bg_button_gold"
         android:gravity="center"
         android:orientation="horizontal"
         android:clickable="true"
@@ -78,15 +78,17 @@
             android:id="@+id/imgSolicitar"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/icon_solicitar" />
+            android:src="@drawable/icon_solicitar"
+            app:tint="#241705" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:text="Solicitar Vehículo"
-            android:textColor="#D4A017"
-            android:textSize="18sp" />
+            android:textColor="#241705"
+            android:textSize="18sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -30,7 +30,6 @@ class AsistenteIA : BaseAdminActivity() {
 
     private lateinit var txtPregunta: EditText
     private lateinit var btnEnviar: Button
-    private lateinit var txtEstado: TextView
     private lateinit var contenedorMensajes: LinearLayout
     private lateinit var scrollMensajes: ScrollView
 
@@ -54,15 +53,9 @@ class AsistenteIA : BaseAdminActivity() {
 
         txtPregunta = findViewById(R.id.txtPreguntaAI)
         btnEnviar = findViewById(R.id.btnEnviarAI)
-        txtEstado = findViewById(R.id.txtEstadoAI)
         contenedorMensajes = findViewById(R.id.contenedorMensajesAI)
         scrollMensajes = findViewById(R.id.scrollMensajesAI)
 
-        txtEstado.text = if (AppConfig.aiBackendEnabled) {
-            "Backend IA habilitado. La respuesta se validara contra el contexto real."
-        } else {
-            "Motor local activo. Responde con datos reales de Firebase mientras conectas tu backend."
-        }
 
         agregarBurbuja(
             texto = getString(R.string.ai_greeting),
@@ -92,20 +85,14 @@ class AsistenteIA : BaseAdminActivity() {
         agregarBurbuja(pregunta, esUsuario = true)
         txtPregunta.text?.clear()
         setLoadingState(true)
-        txtEstado.text = "Consultando datos reales..."
 
         assistantRepository.ask(pregunta) { resultado ->
             runOnUiThread {
                 setLoadingState(false)
                 resultado.onSuccess { reply ->
-                    txtEstado.text = when (reply.mode) {
-                        AiAnswerMode.REMOTE -> "Respuesta generada desde tu backend."
-                        AiAnswerMode.LOCAL -> "Respuesta generada con datos reales de Firebase."
-                    }
                     agregarBurbuja(reply.answer, esUsuario = false)
                 }
                 resultado.onFailure { error ->
-                    txtEstado.text = "No fue posible consultar la IA."
                     agregarBurbuja(
                         error.message ?: getString(R.string.ai_error_generic),
                         esUsuario = false

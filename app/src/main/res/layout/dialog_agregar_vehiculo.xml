@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/bg_dialog"
+    android:background="@drawable/bg_glass_card_gold"
     android:padding="24dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Agregar vehículo"
-        android:textColor="#FFFFFF"
+        android:textColor="#FDFDFD"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -22,7 +22,7 @@
         android:layout_marginTop="2dp"
         android:layout_marginBottom="18dp"
         android:text="Completa los datos de tu auto"
-        android:textColor="#AAAAAA"
+        android:textColor="#8CFFFFFF"
         android:textSize="13sp" />
 
     <!-- Marca -->
@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="MARCA"
-        android:textColor="#D4A017"
+        android:textColor="#F5C55A"
         android:textSize="11sp"
         android:textStyle="bold"
         android:letterSpacing="0.05" />
@@ -40,10 +40,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:background="@drawable/bg_input_field"
+        android:background="@drawable/bg_input_glass"
         android:hint="Ej. Nissan"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#666666"
+        android:textColor="#FDFDFD"
+        android:textColorHint="#4DFFFFFF"
         android:textSize="15sp"
         android:paddingHorizontal="14dp"
         android:paddingVertical="12dp"
@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
         android:text="MODELO (OPCIONAL)"
-        android:textColor="#D4A017"
+        android:textColor="#F5C55A"
         android:textSize="11sp"
         android:textStyle="bold"
         android:letterSpacing="0.05" />
@@ -65,10 +65,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:background="@drawable/bg_input_field"
+        android:background="@drawable/bg_input_glass"
         android:hint="Ej. Versa"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#666666"
+        android:textColor="#FDFDFD"
+        android:textColorHint="#4DFFFFFF"
         android:textSize="15sp"
         android:paddingHorizontal="14dp"
         android:paddingVertical="12dp"
@@ -80,7 +80,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
         android:text="COLOR"
-        android:textColor="#D4A017"
+        android:textColor="#F5C55A"
         android:textSize="11sp"
         android:textStyle="bold"
         android:letterSpacing="0.05" />
@@ -90,10 +90,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:background="@drawable/bg_input_field"
+        android:background="@drawable/bg_input_glass"
         android:hint="Ej. Gris"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#666666"
+        android:textColor="#FDFDFD"
+        android:textColorHint="#4DFFFFFF"
         android:textSize="15sp"
         android:paddingHorizontal="14dp"
         android:paddingVertical="12dp"
@@ -105,7 +105,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
         android:text="PLACA"
-        android:textColor="#D4A017"
+        android:textColor="#F5C55A"
         android:textSize="11sp"
         android:textStyle="bold"
         android:letterSpacing="0.05" />
@@ -115,10 +115,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:background="@drawable/bg_input_field"
+        android:background="@drawable/bg_input_glass"
         android:hint="Ej. ABC1234"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#666666"
+        android:textColor="#FDFDFD"
+        android:textColorHint="#4DFFFFFF"
         android:textSize="15sp"
         android:paddingHorizontal="14dp"
         android:paddingVertical="12dp"
@@ -139,16 +139,17 @@
             android:layout_marginEnd="8dp"
             android:clickable="true"
             android:focusable="true"
-            app:cardCornerRadius="25dp"
-            app:cardBackgroundColor="@color/glass_surface"
-            app:cardElevation="6dp">
+            app:cardCornerRadius="14dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            android:background="@drawable/bg_glass_card"
+            app:cardElevation="0dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="Cancelar"
-                android:textColor="#AAAAAA"
+                android:textColor="#8CFFFFFF"
                 android:textStyle="bold"
                 android:textSize="15sp" />
         </androidx.cardview.widget.CardView>
@@ -161,16 +162,17 @@
             android:layout_marginStart="8dp"
             android:clickable="true"
             android:focusable="true"
-            app:cardCornerRadius="25dp"
-            app:cardBackgroundColor="@color/gold_primary"
-            app:cardElevation="6dp">
+            app:cardCornerRadius="14dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            android:background="@drawable/bg_button_gold"
+            app:cardElevation="0dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="Guardar"
-                android:textColor="#000000"
+                android:textColor="#241705"
                 android:textStyle="bold"
                 android:textSize="15sp" />
         </androidx.cardview.widget.CardView>
