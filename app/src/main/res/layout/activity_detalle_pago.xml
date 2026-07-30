@@ -15,11 +15,11 @@
         android:text="Detalle del Pago"
         android:textColor="#FFFFFF"
         android:textSize="22sp"
-        android:textStyle="italic"
-        android:layout_marginTop="68dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textStyle="bold"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Detalle del costo (sin IVA, alineado con el cálculo de la web) -->
     <LinearLayout

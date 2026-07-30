@@ -1,8 +1,10 @@
 package org.utl.idgs903.appkaaxpark.Cliente
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -55,7 +57,7 @@ abstract class BaseActivity : AppCompatActivity() {
         val btnMenuPago = findViewById<LinearLayout>(R.id.btnMenuPago)
         val btnInfoUsuario = findViewById<ImageView>(R.id.btnPerfil)
         val btnVehiculos = findViewById<CardView>(R.id.btnVehiculos)
-        val btnAsistenteIA = findViewById<LinearLayout>(R.id.btnAsistenteIA)
+        val btnAsistenteIA = findViewById<View>(R.id.btnAsistenteIA)
 
         btnMenuEstancia?.setOnClickListener { viajarA(EstanciaVehiculo::class.java) }
         btnMenuHistorial?.setOnClickListener { viajarA(HistorialVisitas::class.java) }
@@ -64,7 +66,54 @@ abstract class BaseActivity : AppCompatActivity() {
         btnMenuPago?.setOnClickListener { viajarA(DetallePago::class.java) }
         btnInfoUsuario?.setOnClickListener { viajarA(InfoUsuario::class.java) }
         btnVehiculos?.setOnClickListener { viajarA(MisVehiculos::class.java) }
-        btnAsistenteIA?.setOnClickListener { viajarA(ClienteAsistenteIA::class.java) }
+        hacerBotonFlotanteDraggable(btnAsistenteIA) { viajarA(ClienteAsistenteIA::class.java) }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun hacerBotonFlotanteDraggable(view: View?, onClick: () -> Unit) {
+        if (view == null) return
+        var dX = 0f
+        var dY = 0f
+        var isDragging = false
+
+        view.setOnTouchListener { v, event ->
+            val parent = v.parent as? View ?: return@setOnTouchListener false
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    dX = v.x - event.rawX
+                    dY = v.y - event.rawY
+                    isDragging = false
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val newX = event.rawX + dX
+                    val newY = event.rawY + dY
+
+                    val minX = 0f
+                    val maxX = (parent.width - v.width).toFloat()
+                    val minY = 0f
+                    val maxY = (parent.height - v.height).toFloat()
+
+                    val clampedX = newX.coerceIn(minX, maxX)
+                    val clampedY = newY.coerceIn(minY, maxY)
+
+                    if (Math.abs(clampedX - v.x) > 6f || Math.abs(clampedY - v.y) > 6f) {
+                        isDragging = true
+                    }
+
+                    v.x = clampedX
+                    v.y = clampedY
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    if (!isDragging) {
+                        onClick()
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun actualizarEstadoMenuNavegacion() {

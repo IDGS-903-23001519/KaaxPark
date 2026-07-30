@@ -229,6 +229,12 @@ class FirebaseRepository(
             }
     }
 
+    fun sendPasswordResetEmail(email: String, callback: (Result<Unit>) -> Unit) {
+        auth.sendPasswordResetEmail(email)
+            .addOnSuccessListener { callback(Result.success(Unit)) }
+            .addOnFailureListener { error -> callback(Result.failure(error)) }
+    }
+
     fun restoreUserProfile(
         session: UserSession?,
         callback: (Result<UserProfile>) -> Unit
@@ -263,33 +269,24 @@ class FirebaseRepository(
         documentId: String,
         callback: (Result<UserProfile>) -> Unit
     ) {
-        firestore.collection("usuarios")
-            .document(documentId)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val profile = snapshot.toUserProfile()
-                if (profile != null) {
-                    resolveProfileResult(profile, callback)
-                    return@addOnSuccessListener
+        val taskAdmin = firestore.collection("usuarios").document(documentId).get()
+        val taskCliente = firestore.collection("usuariosc").document(documentId).get()
+
+        com.google.android.gms.tasks.Tasks.whenAllComplete(taskAdmin, taskCliente)
+            .addOnCompleteListener {
+                val adminProfile = if (taskAdmin.isSuccessful) taskAdmin.result?.toUserProfile() else null
+                if (adminProfile != null) {
+                    resolveProfileResult(adminProfile, callback)
+                    return@addOnCompleteListener
                 }
 
-                firestore.collection("usuariosc")
-                    .document(documentId)
-                    .get()
-                    .addOnSuccessListener { clientSnapshot ->
-                        val clientProfile = clientSnapshot.toUserProfile()
-                        if (clientProfile == null) {
-                            callback(Result.failure(UserProfileNotFoundException()))
-                            return@addOnSuccessListener
-                        }
-                        resolveProfileResult(clientProfile, callback)
-                    }
-                    .addOnFailureListener { error ->
-                        callback(Result.failure(error))
-                    }
-            }
-            .addOnFailureListener { error ->
-                callback(Result.failure(error))
+                val clientProfile = if (taskCliente.isSuccessful) taskCliente.result?.toUserProfile() else null
+                if (clientProfile != null) {
+                    resolveProfileResult(clientProfile, callback)
+                    return@addOnCompleteListener
+                }
+
+                callback(Result.failure(UserProfileNotFoundException()))
             }
     }
 
@@ -734,35 +731,38 @@ class FirebaseRepository(
         email: String,
         callback: (Result<UserProfile>) -> Unit
     ) {
-        firestore.collection("usuarios")
+        val taskAdmin = firestore.collection("usuarios")
             .whereEqualTo("email", email)
             .limit(1)
             .get()
-            .addOnSuccessListener { snapshot ->
-                val profile = snapshot.documents.firstOrNull()?.toUserProfile()
-                if (profile != null) {
-                    resolveProfileResult(profile, callback)
-                    return@addOnSuccessListener
+
+        val taskCliente = firestore.collection("usuariosc")
+            .whereEqualTo("email", email)
+            .limit(1)
+            .get()
+
+        com.google.android.gms.tasks.Tasks.whenAllComplete(taskAdmin, taskCliente)
+            .addOnCompleteListener {
+                val adminProfile = if (taskAdmin.isSuccessful) {
+                    taskAdmin.result?.documents?.firstOrNull()?.toUserProfile()
+                } else null
+
+                if (adminProfile != null) {
+                    resolveProfileResult(adminProfile, callback)
+                    return@addOnCompleteListener
                 }
 
-                firestore.collection("usuariosc")
-                    .whereEqualTo("email", email)
-                    .limit(1)
-                    .get()
-                    .addOnSuccessListener { clientSnapshot ->
-                        val clientProfile = clientSnapshot.documents.firstOrNull()?.toUserProfile()
-                        if (clientProfile == null) {
-                            callback(Result.failure(UserProfileNotFoundException()))
-                            return@addOnSuccessListener
-                        }
-                        resolveProfileResult(clientProfile, callback)
-                    }
-                    .addOnFailureListener { error ->
-                        callback(Result.failure(error))
-                    }
-            }
-            .addOnFailureListener { error ->
-                callback(Result.failure(error))
+                val clientProfile = if (taskCliente.isSuccessful) {
+                    taskCliente.result?.documents?.firstOrNull()?.toUserProfile()
+                } else null
+
+                if (clientProfile != null) {
+                    resolveProfileResult(clientProfile, callback)
+                    return@addOnCompleteListener
+                }
+
+                val error = taskAdmin.exception ?: taskCliente.exception
+                callback(Result.failure(error ?: UserProfileNotFoundException()))
             }
     }
 

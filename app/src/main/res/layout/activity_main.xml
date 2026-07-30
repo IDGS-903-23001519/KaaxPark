@@ -120,23 +120,82 @@
                     android:id="@+id/imgOjo"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:focusable="true"
                     android:clickable="true"
+                    android:focusable="true"
                     android:src="@drawable/icon_ojo" />
             </LinearLayout>
 
-            <Button
-                android:id="@+id/btnLogin"
+            <TextView
+                android:id="@+id/txtOlvidastePassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"
+                android:text="¿Olvidaste tu contraseña?"
+                android:textColor="@color/gold_secondary"
+                android:textSize="13sp" />
+
+            <FrameLayout
                 android:layout_width="260dp"
                 android:layout_height="55dp"
                 android:layout_gravity="center"
-                android:layout_marginTop="25dp"
-                android:background="@drawable/bg_boton_dorado_solido"
-                android:backgroundTint="@null"
-                android:text="Iniciar Sesión"
-                android:textAllCaps="false"
-                android:textColor="#1A1A1A"
-                android:textSize="18sp" />
+                android:layout_marginTop="20dp">
+
+                <Button
+                    android:id="@+id/btnLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_boton_dorado_solido"
+                    android:backgroundTint="@null"
+                    android:text="Iniciar Sesión"
+                    android:textAllCaps="false"
+                    android:textColor="#1A1A1A"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ProgressBar
+                    android:id="@+id/progressLogin"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="#1A1A1A"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/btnBiometricoContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_boton_contornoregistrar"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="10dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/icon_huella"
+                    app:tint="@color/gold_primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Ingresar con Huella / FaceID"
+                    android:textColor="@color/gold_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
@@ -196,6 +255,5 @@
         app:layout_constraintHorizontal_bias="0.833"
         app:layout_constraintStart_toStartOf="@+id/imgLogo"
         app:layout_constraintTop_toTopOf="@+id/imgLogo" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

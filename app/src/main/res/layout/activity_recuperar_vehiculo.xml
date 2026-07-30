@@ -14,12 +14,12 @@
         android:layout_height="wrap_content"
         android:text="Recuperar Vehículo"
         android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        android:textStyle="italic"
-        android:layout_marginTop="68dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/txtPregunta"

@@ -50,4 +50,5 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.hivemq:hivemq-mqtt-client-shaded:1.3.15")
+    implementation("androidx.biometric:biometric:1.1.0")
 }

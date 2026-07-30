@@ -18,7 +18,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="14dp"
             android:text="Panel de Administración"
             android:textColor="#FFFFFF"
             android:textSize="22sp"
@@ -27,6 +28,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="16dp"
             android:text="Resumen general del sistema."

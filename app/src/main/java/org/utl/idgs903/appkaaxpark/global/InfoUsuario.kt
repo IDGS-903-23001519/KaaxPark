@@ -64,6 +64,11 @@ class InfoUsuario : AppCompatActivity() {
 
         cardVehiculo = findViewById(R.id.cardVehiculo)
 
+        val btnVolver = findViewById<android.widget.ImageView>(R.id.btnVolver)
+        btnVolver?.setOnClickListener {
+            finish()
+        }
+
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion)
 
         btnCerrarSesion.setOnClickListener {
@@ -88,11 +93,32 @@ class InfoUsuario : AppCompatActivity() {
                 .show()
         }
 
+        // Carga instantánea desde sesión caché (0 ms de espera)
+        mostrarSesionEnCache()
+
         cargarUsuario()
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+    }
+
+    private fun mostrarSesionEnCache() {
+        val cachedSession = sessionManager.getSession() ?: return
+        txtEmail.text = cachedSession.email
+        txtRol.text = cachedSession.role
+        txtNombre.text = if (cachedSession.name.isNotBlank()) cachedSession.name else cachedSession.email
+        txtEstado.text = "Activo"
+        txtEstado.setBackgroundResource(R.drawable.bg_chip_ok)
+        txtEstado.setTextColor(Color.parseColor("#2ECC71"))
+
+        if (cachedSession.role.equals("ADMIN", true)) {
+            lblCampoSecundario.text = "Usuario"
+            txtCampoSecundario.text = if (cachedSession.username.isNotBlank()) cachedSession.username else "N/A"
+        } else {
+            lblCampoSecundario.text = "Teléfono"
+            txtCampoSecundario.text = if (cachedSession.phone.isNotBlank()) cachedSession.phone else "N/A"
         }
     }
 
@@ -103,6 +129,8 @@ class InfoUsuario : AppCompatActivity() {
             runOnUiThread {
 
                 result.onSuccess { usuario ->
+                    // Guardar perfil actualizado en cache local
+                    sessionManager.saveSession(repository.getCurrentUserUid().orEmpty(), usuario)
 
                     txtNombre.text = usuario.name
                     txtRol.text = usuario.role
@@ -165,14 +193,15 @@ class InfoUsuario : AppCompatActivity() {
                 }
 
                 result.onFailure {
-
-                    Toast.makeText(
-                        this,
-                        it.message,
-                        Toast.LENGTH_LONG
-                    ).show()
-
-                    finish()
+                    // Si ya se mostraron datos en caché, no cerramos abruptamente por fallos temporales de red
+                    if (sessionManager.getSession() == null) {
+                        Toast.makeText(
+                            this,
+                            it.message,
+                            Toast.LENGTH_LONG
+                        ).show()
+                        finish()
+                    }
                 }
             }
         }
