@@ -26,6 +26,7 @@
         android:layout_marginTop="2dp"
         android:layout_marginBottom="14dp"
         android:text="@string/ai_screen_subtitle"
+        android:textAlignment="center"
         android:textColor="#A0A0A0"
         android:textSize="14sp"
         android:textStyle="italic" />
@@ -44,9 +45,10 @@
             android:padding="16dp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="348dp"
                 android:layout_height="wrap_content"
                 android:text="Regla de respuesta"
+                android:textAlignment="center"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -55,7 +57,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="La IA responde solo con datos reales de Firebase y, si esta habilitado, con el backend que tu configures."
+                android:text="La IA responde solo con datos reales de Firebase."
+                android:textAlignment="center"
                 android:textColor="#A0A0A0"
                 android:textSize="12sp" />
 
@@ -67,6 +70,7 @@
                 android:background="@drawable/bg_recuadro_sutil"
                 android:padding="12dp"
                 android:text="Preparando asistente..."
+                android:textAlignment="center"
                 android:textColor="#D4A017"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -126,7 +130,8 @@
                 android:maxLines="3"
                 android:padding="12dp"
                 android:textColor="#FFFFFF"
-                android:textColorHint="#7F7F7F" />
+                android:textColorHint="#7F7F7F"
+                android:textSize="16sp" />
 
             <Button
                 android:id="@+id/btnEnviarAI"
