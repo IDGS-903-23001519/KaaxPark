@@ -1,10 +1,8 @@
 package org.utl.idgs903.appkaaxpark.Admin
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -24,7 +22,7 @@ abstract class BaseAdminActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        WindowCompat.getInsetsController(window, window.decorView)?.apply {
+        WindowCompat.getInsetsController(window, window.decorView).apply {
             isAppearanceLightStatusBars = false
             isAppearanceLightNavigationBars = false
         }
@@ -44,7 +42,7 @@ abstract class BaseAdminActivity : AppCompatActivity() {
         val btnMenuSustentabilidad = findViewById<LinearLayout>(R.id.btnMenuSustentabilidad)
         val btnInfoUsuario = findViewById<ImageView>(R.id.btnPerfil)
 
-        val btnAsistenteIA = findViewById<View>(R.id.btnAsistenteIA)
+        val btnMenuCentralK = findViewById<CardView>(R.id.btnMenuCentralK)
 
         btnMenuDashboard?.setOnClickListener { viajarA(Dashboard::class.java) }
         btnMenuCajones?.setOnClickListener { viajarA(Cajones::class.java) }
@@ -53,53 +51,6 @@ abstract class BaseAdminActivity : AppCompatActivity() {
         btnInfoUsuario?.setOnClickListener { viajarA(InfoUsuario::class.java) }
 
 
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun hacerBotonFlotanteDraggable(view: View?, onClick: () -> Unit) {
-        if (view == null) return
-        var dX = 0f
-        var dY = 0f
-        var isDragging = false
-
-        view.setOnTouchListener { v, event ->
-            val parent = v.parent as? View ?: return@setOnTouchListener false
-            when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN -> {
-                    dX = v.x - event.rawX
-                    dY = v.y - event.rawY
-                    isDragging = false
-                    true
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    val newX = event.rawX + dX
-                    val newY = event.rawY + dY
-
-                    val minX = 0f
-                    val maxX = (parent.width - v.width).toFloat()
-                    val minY = 0f
-                    val maxY = (parent.height - v.height).toFloat()
-
-                    val clampedX = newX.coerceIn(minX, maxX)
-                    val clampedY = newY.coerceIn(minY, maxY)
-
-                    if (Math.abs(clampedX - v.x) > 6f || Math.abs(clampedY - v.y) > 6f) {
-                        isDragging = true
-                    }
-
-                    v.x = clampedX
-                    v.y = clampedY
-                    true
-                }
-                MotionEvent.ACTION_UP -> {
-                    if (!isDragging) {
-                        onClick()
-                    }
-                    true
-                }
-                else -> false
-            }
-        }
     }
 
     protected fun viajarA(destino: Class<*>) {
