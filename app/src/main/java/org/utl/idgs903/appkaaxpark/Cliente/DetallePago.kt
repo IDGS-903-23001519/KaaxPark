@@ -12,8 +12,6 @@ import org.utl.idgs903.appkaaxpark.MainActivity
 import org.utl.idgs903.appkaaxpark.R
 import org.utl.idgs903.appkaaxpark.data.ActiveStay
 import org.utl.idgs903.appkaaxpark.data.CajonMotorHelper
-import org.utl.idgs903.appkaaxpark.data.FirebaseRepository
-import org.utl.idgs903.appkaaxpark.data.SessionManager
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -21,9 +19,6 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 class DetallePago : BaseActivity() {
-
-    private lateinit var repository: FirebaseRepository
-    private lateinit var sessionManager: SessionManager
 
     // ── Views ─────────────────────────────────────────────────────────────────
     private lateinit var txtTiempoTotalValor: TextView
@@ -58,9 +53,6 @@ class DetallePago : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        repository    = FirebaseRepository()
-        sessionManager = SessionManager(this)
 
         txtTiempoTotalValor = findViewById(R.id.txtTiempoTotalValor)
         txtTarifaValor      = findViewById(R.id.txtTarifaValor)

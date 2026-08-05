@@ -1,10 +1,8 @@
 package org.utl.idgs903.appkaaxpark.Cliente
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -14,12 +12,18 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import org.utl.idgs903.appkaaxpark.R
+import org.utl.idgs903.appkaaxpark.data.FirebaseRepository
+import org.utl.idgs903.appkaaxpark.data.SessionManager
 import org.utl.idgs903.appkaaxpark.global.InfoUsuario
 
 abstract class BaseActivity : AppCompatActivity() {
 
+    protected lateinit var repository: FirebaseRepository
+    protected lateinit var sessionManager: SessionManager
 
     private var lastBackPressedTime = 0L
     protected open fun shouldExitOnBackPress(): Boolean = true
@@ -36,17 +40,42 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        repository = FirebaseRepository()
+        sessionManager = SessionManager(this)
+
         WindowCompat.getInsetsController(window, window.decorView)?.apply {
             isAppearanceLightStatusBars = false
             isAppearanceLightNavigationBars = false
         }
 
         setContentView(R.layout.activity_layout_base)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_base)) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
         val contenedor = findViewById<FrameLayout>(R.id.contenedor_paginas)
         LayoutInflater.from(this).inflate(getLayoutId(), contenedor, true)
         configurarMenuNavegacion()
         marcarPantallaActiva()
         actualizarEstadoMenuNavegacion()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        verificarBloqueoNavegacion()
+    }
+
+    private fun verificarBloqueoNavegacion() {
+        val session = sessionManager.getSession() ?: return
+        repository.fetchClientStayDetails(session.userDocId) { result ->
+            result.onSuccess { details ->
+                // Si NO hay estancia activa, la navegación está bloqueada (debe escanear QR)
+                navegacionBloqueada = details == null
+            }
+        }
     }
 
     private fun configurarMenuNavegacion() {
@@ -57,7 +86,6 @@ abstract class BaseActivity : AppCompatActivity() {
         val btnMenuPago = findViewById<LinearLayout>(R.id.btnMenuPago)
         val btnInfoUsuario = findViewById<ImageView>(R.id.btnPerfil)
         val btnVehiculos = findViewById<CardView>(R.id.btnVehiculos)
-        val btnAsistenteIA = findViewById<View>(R.id.btnAsistenteIA)
 
         btnMenuEstancia?.setOnClickListener { viajarA(EstanciaVehiculo::class.java) }
         btnMenuHistorial?.setOnClickListener { viajarA(HistorialVisitas::class.java) }
@@ -66,54 +94,6 @@ abstract class BaseActivity : AppCompatActivity() {
         btnMenuPago?.setOnClickListener { viajarA(DetallePago::class.java) }
         btnInfoUsuario?.setOnClickListener { viajarA(InfoUsuario::class.java) }
         btnVehiculos?.setOnClickListener { viajarA(MisVehiculos::class.java) }
-        hacerBotonFlotanteDraggable(btnAsistenteIA) { viajarA(ClienteAsistenteIA::class.java) }
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun hacerBotonFlotanteDraggable(view: View?, onClick: () -> Unit) {
-        if (view == null) return
-        var dX = 0f
-        var dY = 0f
-        var isDragging = false
-
-        view.setOnTouchListener { v, event ->
-            val parent = v.parent as? View ?: return@setOnTouchListener false
-            when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN -> {
-                    dX = v.x - event.rawX
-                    dY = v.y - event.rawY
-                    isDragging = false
-                    true
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    val newX = event.rawX + dX
-                    val newY = event.rawY + dY
-
-                    val minX = 0f
-                    val maxX = (parent.width - v.width).toFloat()
-                    val minY = 0f
-                    val maxY = (parent.height - v.height).toFloat()
-
-                    val clampedX = newX.coerceIn(minX, maxX)
-                    val clampedY = newY.coerceIn(minY, maxY)
-
-                    if (Math.abs(clampedX - v.x) > 6f || Math.abs(clampedY - v.y) > 6f) {
-                        isDragging = true
-                    }
-
-                    v.x = clampedX
-                    v.y = clampedY
-                    true
-                }
-                MotionEvent.ACTION_UP -> {
-                    if (!isDragging) {
-                        onClick()
-                    }
-                    true
-                }
-                else -> false
-            }
-        }
     }
 
     private fun actualizarEstadoMenuNavegacion() {
@@ -141,13 +121,19 @@ abstract class BaseActivity : AppCompatActivity() {
             isEnabled = true
             alpha = 1f
         }
+
+        // El botón QR se bloquea si ya hay una estancia activa (navegación desbloqueada)
+        findViewById<View>(R.id.btnMenuQR)?.apply {
+            isEnabled = navegacionBloqueada
+            alpha = if (navegacionBloqueada) 1f else 0.4f
+        }
     }
     private fun viajarA(destino: Class<*>) {
         val esHistorial = destino == HistorialVisitas::class.java
         val esPerfil = destino == InfoUsuario::class.java
-        val esAsistenteIA = destino == ClienteAsistenteIA::class.java
+        val esQR = destino == Codigoqr::class.java
 
-        if (navegacionBloqueada && !esHistorial && !esPerfil && !esAsistenteIA) {
+        if (navegacionBloqueada && !esHistorial && !esPerfil && !esQR) {
             Toast.makeText(
                 this,
                 "Escanea el codigo QR de entrada para continuar.",

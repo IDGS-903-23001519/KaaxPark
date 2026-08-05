@@ -12,14 +12,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import org.utl.idgs903.appkaaxpark.R
-import org.utl.idgs903.appkaaxpark.data.FirebaseRepository
-import org.utl.idgs903.appkaaxpark.data.SessionManager
 import org.utl.idgs903.appkaaxpark.data.VehicleInfo
 
 class MisVehiculos : BaseActivity() {
 
-    private lateinit var repository: FirebaseRepository
-    private lateinit var sessionManager: SessionManager
     private lateinit var contenedorVehiculos: LinearLayout
     private lateinit var btnAgregarVehiculo: CardView
 
@@ -30,9 +26,6 @@ class MisVehiculos : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        repository = FirebaseRepository()
-        sessionManager = SessionManager(this)
 
         contenedorVehiculos = findViewById(R.id.contenedorVehiculos)
         btnAgregarVehiculo = findViewById(R.id.btnAgregarVehiculo)

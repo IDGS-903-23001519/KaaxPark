@@ -8,8 +8,6 @@ import android.widget.TextView
 import android.widget.Toast
 import org.utl.idgs903.appkaaxpark.MainActivity
 import org.utl.idgs903.appkaaxpark.R
-import org.utl.idgs903.appkaaxpark.data.FirebaseRepository
-import org.utl.idgs903.appkaaxpark.data.SessionManager
 
 /**
  * Pantalla final del flujo de pago.
@@ -29,8 +27,6 @@ class RecuperarVehiculo : BaseActivity() {
         const val EXTRA_VEHICULO_EN_CAMINO = "vehiculo_en_camino"
     }
 
-    private lateinit var repository: FirebaseRepository
-    private lateinit var sessionManager: SessionManager
     private lateinit var txtPregunta: TextView
     private lateinit var txtDescripcion: TextView
     private lateinit var btnSolicitar: LinearLayout
@@ -40,8 +36,6 @@ class RecuperarVehiculo : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        repository    = FirebaseRepository()
-        sessionManager = SessionManager(this)
         txtPregunta   = findViewById(R.id.txtPregunta)
         txtDescripcion = findViewById(R.id.txtDescripcion)
         btnSolicitar  = findViewById(R.id.btnSolicitar)

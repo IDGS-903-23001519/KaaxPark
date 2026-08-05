@@ -13,8 +13,6 @@ import android.widget.TextView
 import android.widget.Toast
 import org.utl.idgs903.appkaaxpark.MainActivity
 import org.utl.idgs903.appkaaxpark.R
-import org.utl.idgs903.appkaaxpark.data.FirebaseRepository
-import org.utl.idgs903.appkaaxpark.data.SessionManager
 import org.utl.idgs903.appkaaxpark.data.VisitHistoryItem
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -22,8 +20,6 @@ import java.util.Locale
 
 class HistorialVisitas : BaseActivity() {
 
-    private lateinit var repository: FirebaseRepository
-    private lateinit var sessionManager: SessionManager
     private lateinit var contenedorHistorial: LinearLayout
     private lateinit var txtSinRegistros: TextView
     private lateinit var layoutFiltro: LinearLayout
@@ -45,8 +41,6 @@ class HistorialVisitas : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        repository = FirebaseRepository()
-        sessionManager = SessionManager(this)
         contenedorHistorial = findViewById(R.id.contenedorHistorial)
         txtSinRegistros = findViewById(R.id.txtSinRegistros)
         layoutFiltro = findViewById(R.id.layoutFiltro)

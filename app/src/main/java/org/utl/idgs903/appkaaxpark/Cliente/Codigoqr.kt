@@ -15,16 +15,12 @@ import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import org.utl.idgs903.appkaaxpark.R
 import org.utl.idgs903.appkaaxpark.data.CajonMotorHelper
 import org.utl.idgs903.appkaaxpark.data.EstanciaActivaExistenteException
-import org.utl.idgs903.appkaaxpark.data.FirebaseRepository
-import org.utl.idgs903.appkaaxpark.data.SessionManager
 import org.utl.idgs903.appkaaxpark.data.SinCajonesDisponiblesException
 import org.utl.idgs903.appkaaxpark.data.VehicleInfo
 import org.utl.idgs903.appkaaxpark.data.VehiculoNoEncontradoException
 
 class Codigoqr : BaseActivity() {
 
-    private lateinit var repository: FirebaseRepository
-    private lateinit var sessionManager: SessionManager
     private lateinit var txtResultadoAsignacion: TextView
     private lateinit var contenedorVehiculosQR: LinearLayout
     private lateinit var contenedorEscaneo: LinearLayout
@@ -63,16 +59,12 @@ class Codigoqr : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        repository = FirebaseRepository()
-        sessionManager = SessionManager(this)
         txtResultadoAsignacion = findViewById(R.id.txtResultadoAsignacion)
         contenedorVehiculosQR = findViewById(R.id.contenedorVehiculosQR)
         contenedorEscaneo = findViewById(R.id.contenedorEscaneo)
         contenedorSeleccionVehiculo = findViewById(R.id.contenedorSeleccionVehiculo)
         btnIniciarEscaneo = findViewById(R.id.btnIniciarEscaneo)
         txtVolverEscaneo = findViewById(R.id.txtVolverEscaneo)
-
-        navegacionBloqueada = true
 
         btnIniciarEscaneo.setOnClickListener { iniciarEscaneo() }
         txtVolverEscaneo.setOnClickListener { volverAEscanear() }
@@ -83,7 +75,6 @@ class Codigoqr : BaseActivity() {
     override fun onStart() {
         super.onStart()
         cargarVehiculos()
-        verificarEstanciaExistente()
     }
 
     // --- Control de las distintas pantallas (escanear / elegir vehículo / ya estacionado) ---

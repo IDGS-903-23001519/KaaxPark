@@ -11,7 +11,9 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import org.utl.idgs903.appkaaxpark.R
 import org.utl.idgs903.appkaaxpark.global.InfoUsuario
 
@@ -28,6 +30,13 @@ abstract class BaseAdminActivity : AppCompatActivity() {
         }
 
         setContentView(R.layout.activity_layout_base_admin)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_base_admin)) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
         val contenedor = findViewById<FrameLayout>(R.id.containerDashboard)
         LayoutInflater.from(this).inflate(getLayoutId(), contenedor, true)
 

@@ -14,7 +14,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import org.utl.idgs903.appkaaxpark.R
 import org.utl.idgs903.appkaaxpark.data.AppConfig
-import org.utl.idgs903.appkaaxpark.data.SessionManager
 import org.utl.idgs903.appkaaxpark.data.ai.AiAnswerMode
 import org.utl.idgs903.appkaaxpark.data.ai.AiAssistantRepository
 import org.utl.idgs903.appkaaxpark.data.ai.ParkingAiAssistantRepository
@@ -24,7 +23,6 @@ class ClienteAsistenteIA : BaseActivity() {
 
     override fun getLayoutId(): Int = R.layout.activity_cliente_asistente_ia
 
-    private lateinit var sessionManager: SessionManager
     private var userDocId: String? = null
     private lateinit var assistantRepository: AiAssistantRepository
 
@@ -37,7 +35,6 @@ class ClienteAsistenteIA : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        sessionManager = SessionManager(this)
         val session = sessionManager.getSession()
         userDocId = session?.userDocId?.takeIf { it.isNotBlank() }
 

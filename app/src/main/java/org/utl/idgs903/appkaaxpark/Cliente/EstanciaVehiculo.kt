@@ -10,15 +10,11 @@ import android.widget.Toast
 import org.utl.idgs903.appkaaxpark.MainActivity
 import org.utl.idgs903.appkaaxpark.R
 import org.utl.idgs903.appkaaxpark.data.ClientStayDetails
-import org.utl.idgs903.appkaaxpark.data.FirebaseRepository
-import org.utl.idgs903.appkaaxpark.data.SessionManager
 import org.utl.idgs903.appkaaxpark.data.UserProfile
 import kotlin.math.max
 
 class EstanciaVehiculo : BaseActivity() {
 
-    private lateinit var repository: FirebaseRepository
-    private lateinit var sessionManager: SessionManager
     private lateinit var txtSubtitulo: TextView
     private lateinit var txtTiempoMarcador: TextView
     private lateinit var txtDetalleMarca: TextView
@@ -49,8 +45,6 @@ class EstanciaVehiculo : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        repository = FirebaseRepository()
-        sessionManager = SessionManager(this)
         txtSubtitulo = findViewById(R.id.txtSubtitulo)
         txtTiempoMarcador = findViewById(R.id.txtTiempoMarcador)
         txtDetalleMarca = findViewById(R.id.txtDetalleMarca)
