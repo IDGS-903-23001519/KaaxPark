@@ -133,9 +133,14 @@ data class ParkingAiContext(
             appendLine("Total administradores: $totalAdministradores")
         }
         sustentabilidad?.let { info ->
+            val nivelSolar = when {
+                info.porcentajeSolar >= 70.0 -> "ALTA"
+                info.porcentajeSolar >= 40.0 -> "MEDIA"
+                else -> "BAJA"
+            }
             appendLine("Agua captada: ${formatNumber(info.aguaCaptadaLitros)} L")
             appendLine("Agua usada en riego: ${formatNumber(info.aguaUsadaRiegoLitros)} L")
-            appendLine("Energia generada: ${formatNumber(info.energiaGeneradaKwh)} kWh")
+            appendLine("Nivel solar: $nivelSolar")
             appendLine("Nivel del tanque: ${formatNumber(info.nivelTanquePorcentaje)}%")
             appendLine("Porcentaje solar: ${formatNumber(info.porcentajeSolar)}%")
         }

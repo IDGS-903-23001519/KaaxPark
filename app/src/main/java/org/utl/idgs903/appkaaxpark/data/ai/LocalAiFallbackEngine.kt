@@ -287,7 +287,12 @@ object LocalAiFallbackEngine {
     private fun buildSustentabilidadEnergia(context: ParkingAiContext): String {
         val info = context.sustentabilidad
             ?: return "No encontre datos de sustentabilidad en la base de datos."
-        return "Se generaron ${formatNumber(info.energiaGeneradaKwh)} kWh de energia solar."
+        val nivel = when {
+            info.porcentajeSolar >= 70.0 -> "ALTA"
+            info.porcentajeSolar >= 40.0 -> "MEDIA"
+            else -> "BAJA"
+        }
+        return "El nivel de recepcion solar es $nivel con un aporte del ${formatNumber(info.porcentajeSolar)}%."
     }
 
     private fun buildSustentabilidadCO2(context: ParkingAiContext): String {
@@ -336,8 +341,12 @@ object LocalAiFallbackEngine {
     private fun buildSustentabilidadAhorro(context: ParkingAiContext): String {
         val info = context.sustentabilidad
             ?: return "No encontre datos de sustentabilidad en la base de datos."
-        val energiaKwh = info.energiaGeneradaKwh
-        return "Se ahorraron ${formatNumber(energiaKwh)} kWh de energia gracias al sistema solar."
+        val nivel = when {
+            info.porcentajeSolar >= 70.0 -> "ALTA"
+            info.porcentajeSolar >= 40.0 -> "MEDIA"
+            else -> "BAJA"
+        }
+        return "Se esta recibiendo energia: $nivel (aporte solar del ${formatNumber(info.porcentajeSolar)}%)."
     }
 
     private fun buildResumen(context: ParkingAiContext): String = buildString {

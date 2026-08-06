@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="220dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog"
+    android:orientation="vertical"
+    android:elevation="8dp">
+
+    <TextView
+        android:id="@+id/opcionGeneral"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:text="General (Resumen)"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"/>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" />
+
+    <TextView
+        android:id="@+id/opcionPagos"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:text="Pagos / Financiero"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"/>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" />
+
+    <TextView
+        android:id="@+id/opcionCajones"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:text="Cajones / Ocupación"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"/>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" />
+
+    <TextView
+        android:id="@+id/opcionSustentabilidad"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:text="Sustentabilidad"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"/>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" />
+
+    <TextView
+        android:id="@+id/opcionMotores"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:text="Control de Motores"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"/>
+
+</LinearLayout>

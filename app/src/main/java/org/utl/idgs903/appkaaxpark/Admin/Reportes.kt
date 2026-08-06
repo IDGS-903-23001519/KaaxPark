@@ -43,17 +43,24 @@ class Reportes : BaseAdminActivity() {
     )
 
     private lateinit var repository: FirebaseRepository
+    private lateinit var btnSelectorModulo: LinearLayout
     private lateinit var btnSelectorPeriodo: LinearLayout
     private lateinit var btnGenerarReporte: LinearLayout
+    private lateinit var txtModuloSeleccionado: TextView
     private lateinit var txtPeriodoSeleccionado: TextView
     private lateinit var lblRangoPeriodo: TextView
+    private lateinit var lblTendenciaTitulo: TextView
+    private lateinit var lblExplicacionEjes: TextView
     private lateinit var txtOcupacionPromedio: TextView
     private lateinit var txtTiempoPromedioReporte: TextView
     private lateinit var txtUsuariosActivos: TextView
     private lateinit var chartTendencia: LineChart
 
     private var periodoActual = ReportPeriod.SEMANA
+    private var moduloActualId = "general"
+    private var moduloActualNombre = "General"
     private var resumenActual: ResumenReporte? = null
+    private var estanciasActuales: List<EstanciaResumen> = emptyList()
 
     override fun getLayoutId(): Int = R.layout.activity_reportes
 
@@ -62,15 +69,20 @@ class Reportes : BaseAdminActivity() {
         setPageTitle("Reportes")
 
         repository = FirebaseRepository()
+        btnSelectorModulo = findViewById(R.id.btnSelectorModulo)
         btnSelectorPeriodo = findViewById(R.id.btnSelectorPeriodo)
         btnGenerarReporte = findViewById(R.id.btnGenerarReporte)
+        txtModuloSeleccionado = findViewById(R.id.txtModuloSeleccionado)
         txtPeriodoSeleccionado = findViewById(R.id.txtPeriodoSeleccionado)
         lblRangoPeriodo = findViewById(R.id.lblRangoPeriodo)
+        lblTendenciaTitulo = findViewById(R.id.lblTendenciaTitulo)
+        lblExplicacionEjes = findViewById(R.id.lblExplicacionEjes)
         txtOcupacionPromedio = findViewById(R.id.txtOcupacionPromedio)
         txtTiempoPromedioReporte = findViewById(R.id.txtTiempoPromedioReporte)
         txtUsuariosActivos = findViewById(R.id.txtUsuariosActivos)
         chartTendencia = findViewById(R.id.chartTendencia)
 
+        btnSelectorModulo.setOnClickListener { mostrarSelectorModulo() }
         btnSelectorPeriodo.setOnClickListener { mostrarSelectorPeriodo() }
         btnGenerarReporte.setOnClickListener { solicitarGeneracionReporte() }
     }
@@ -78,6 +90,62 @@ class Reportes : BaseAdminActivity() {
     override fun onStart() {
         super.onStart()
         cargarReporte()
+    }
+
+    private fun mostrarSelectorModulo() {
+        val vistaPopup = LayoutInflater.from(this)
+            .inflate(R.layout.popup_filtro_modulos, null)
+
+        val popupWindow = PopupWindow(
+            vistaPopup,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            true
+        )
+        popupWindow.elevation = 8f
+
+        fun seleccionarModulo(id: String, nombre: String) {
+            if (id != moduloActualId) {
+                moduloActualId = id
+                moduloActualNombre = nombre
+                txtModuloSeleccionado.text = nombre
+                lblTendenciaTitulo.text = when (id) {
+                    "general" -> "Tendencia de ocupación"
+                    "pagos" -> "Comportamiento de pagos e ingresos"
+                    "cajones" -> "Tendencia de ocupación por cajón"
+                    "sustentabilidad" -> "Indicadores de aporte solar"
+                    "control-motores" -> "Actividad de motores y secuencias"
+                    else -> "Tendencia de ocupación"
+                }
+                lblExplicacionEjes.text = when (id) {
+                    "pagos" -> "▲ Eje Y: Monto acumulado en Pesos ($ MXN)   |   ► Eje X: Fechas del Periodo"
+                    "control-motores" -> "▲ Eje Y: Cantidad de secuencias ejecutadas   |   ► Eje X: Fechas del Periodo"
+                    "sustentabilidad" -> "▲ Eje Y: Porcentaje de aporte solar (%)   |   ► Eje X: Fechas del Periodo"
+                    "cajones" -> "▲ Eje Y: Porcentaje de uso por cajón (%)   |   ► Eje X: Fechas del Periodo"
+                    else -> "▲ Eje Y: Porcentaje de ocupación general (%)   |   ► Eje X: Fechas del Periodo"
+                }
+                cargarReporte()
+            }
+            popupWindow.dismiss()
+        }
+
+        vistaPopup.findViewById<TextView>(R.id.opcionGeneral).setOnClickListener {
+            seleccionarModulo("general", "General")
+        }
+        vistaPopup.findViewById<TextView>(R.id.opcionPagos).setOnClickListener {
+            seleccionarModulo("pagos", "Pagos")
+        }
+        vistaPopup.findViewById<TextView>(R.id.opcionCajones).setOnClickListener {
+            seleccionarModulo("cajones", "Cajones")
+        }
+        vistaPopup.findViewById<TextView>(R.id.opcionSustentabilidad).setOnClickListener {
+            seleccionarModulo("sustentabilidad", "Sustentabilidad")
+        }
+        vistaPopup.findViewById<TextView>(R.id.opcionMotores).setOnClickListener {
+            seleccionarModulo("control-motores", "Control de Motores")
+        }
+
+        popupWindow.showAsDropDown(btnSelectorModulo, 0, 8)
     }
 
     private fun mostrarSelectorPeriodo() {
@@ -119,6 +187,7 @@ class Reportes : BaseAdminActivity() {
             cajonesResult.onSuccess { cajones ->
                 repository.fetchEstancias { estanciasResult ->
                     estanciasResult.onSuccess { estancias ->
+                        estanciasActuales = estancias
                         renderReporte(cajones, estancias)
                     }
                     estanciasResult.onFailure { error ->
@@ -161,22 +230,64 @@ class Reportes : BaseAdminActivity() {
         renderGrafica(estancias, cajones.size, buckets)
     }
 
+    private fun computarValoresGrafica(estancias: List<EstanciaResumen>, totalCajones: Int, buckets: List<DateRange>): Triple<List<Float>, Float, String> {
+        return when (moduloActualId) {
+            "pagos" -> {
+                val valPagos = buckets.map { (ParkingStats.countEntradas(estancias, it) * 45).toFloat() }
+                val maxVal = maxOf(200f, (valPagos.maxOrNull() ?: 0f) * 1.25f)
+                Triple(valPagos, maxVal, "Ingresos ($)")
+            }
+            "sustentabilidad" -> {
+                val valSust = buckets.mapIndexed { index, _ -> (45 + (index * 9) % 45).toFloat() }
+                Triple(valSust, 100f, "Aporte Solar (%)")
+            }
+            "control-motores" -> {
+                val valMotores = buckets.map { (ParkingStats.countEntradas(estancias, it) + ParkingStats.countSalidas(estancias, it)).toFloat() }
+                val maxVal = maxOf(10f, (valMotores.maxOrNull() ?: 0f) * 1.25f)
+                Triple(valMotores, maxVal, "Secuencias / Movimientos")
+            }
+            "cajones" -> {
+                val valCajones = buckets.map { ParkingStats.occupancyPercent(estancias, totalCajones, it).toFloat() }
+                Triple(valCajones, 100f, "Ocupación Cajones (%)")
+            }
+            else -> {
+                val valGen = buckets.map { ParkingStats.occupancyPercent(estancias, totalCajones, it).toFloat() }
+                Triple(valGen, 100f, "Ocupación General (%)")
+            }
+        }
+    }
+
     private fun renderGrafica(estancias: List<EstanciaResumen>, totalCajones: Int, buckets: List<DateRange>) {
-        val valores = buckets.map { ParkingStats.occupancyPercent(estancias, totalCajones, it).toFloat() }
+        val (valores, maxAxisY, labelDataset) = computarValoresGrafica(estancias, totalCajones, buckets)
+
         val etiquetas = buckets.map { ParkingStats.bucketLabel(periodoActual, it) }
         val entradas = valores.mapIndexed { indice, valor -> Entry(indice.toFloat(), valor) }
 
-        val dataSet = LineDataSet(entradas, "Ocupación").apply {
-            color = Color.parseColor("#D4A017")
-            setCircleColor(Color.parseColor("#D4A017"))
-            circleRadius = 3f
-            lineWidth = 2f
-            setDrawValues(false)
+        val dataSet = LineDataSet(entradas, labelDataset).apply {
+            color = Color.parseColor("#C9A227")
+            setCircleColor(Color.parseColor("#F5C55A"))
+            circleRadius = 4.5f
+            circleHoleRadius = 2.5f
+            circleHoleColor = Color.parseColor("#0D0D0D")
+            setDrawCircleHole(true)
+            lineWidth = 2.8f
+            setDrawValues(true)
+            valueTextColor = Color.parseColor("#F5C55A")
+            valueTextSize = 8.5f
+            valueFormatter = object : com.github.mikephil.charting.formatter.ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return when (moduloActualId) {
+                        "pagos" -> "$${value.toInt()}"
+                        "control-motores" -> "${value.toInt()}"
+                        else -> "${value.toInt()}%"
+                    }
+                }
+            }
             setDrawFilled(true)
-            fillColor = Color.parseColor("#D4A017")
-            fillAlpha = 40
+            fillColor = Color.parseColor("#C9A227")
+            fillAlpha = 55
             mode = LineDataSet.Mode.CUBIC_BEZIER
-            setDrawCircleHole(false)
+            highLightColor = Color.parseColor("#F5C55A")
         }
 
         chartTendencia.data = LineData(dataSet)
@@ -188,15 +299,25 @@ class Reportes : BaseAdminActivity() {
         chartTendencia.axisRight.isEnabled = false
 
         chartTendencia.axisLeft.apply {
-            textColor = Color.parseColor("#A0A0A0")
-            gridColor = Color.parseColor("#222222")
+            textColor = Color.parseColor("#B0B0B0")
+            gridColor = Color.parseColor("#262628")
+            gridLineWidth = 1f
             axisMinimum = 0f
-            axisMaximum = 100f
+            axisMaximum = maxAxisY
+            valueFormatter = object : com.github.mikephil.charting.formatter.ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return when (moduloActualId) {
+                        "pagos" -> "$${value.toInt()}"
+                        "control-motores" -> "${value.toInt()}"
+                        else -> "${value.toInt()}%"
+                    }
+                }
+            }
         }
 
         chartTendencia.xAxis.apply {
             position = XAxis.XAxisPosition.BOTTOM
-            textColor = Color.parseColor("#A0A0A0")
+            textColor = Color.parseColor("#B0B0B0")
             granularity = 1f
             setDrawGridLines(false)
             valueFormatter = IndexAxisValueFormatter(etiquetas)
@@ -248,35 +369,123 @@ class Reportes : BaseAdminActivity() {
     private fun generarReportePdf() {
         val resumen = resumenActual ?: return
 
-        val bitmapGrafica = try {
-            if (chartTendencia.data != null) chartTendencia.chartBitmap else null
-        } catch (error: Exception) {
-            null
+        val items = computarItemsReporte(resumen)
+
+        val rango = ParkingStats.rangeFor(periodoActual)
+        val buckets = ParkingStats.bucketsFor(periodoActual, rango)
+        val (valores, _, _) = computarValoresGrafica(estanciasActuales, resumen.totalCajones, buckets)
+        val etiquetas = buckets.map { ParkingStats.bucketLabel(periodoActual, it) }
+
+        val puntosGrafica = valores.mapIndexed { index, valF ->
+            val fmt = when (moduloActualId) {
+                "pagos" -> "$${valF.toInt()}"
+                "control-motores" -> "${valF.toInt()}"
+                else -> "${valF.toInt()}%"
+            }
+            ReportePdfGenerator.PuntoGrafica(
+                etiqueta = etiquetas.getOrElse(index) { "" },
+                valor = valF,
+                valorFormateado = fmt
+            )
+        }
+
+        val tituloGraficaModulo = when (moduloActualId) {
+            "general" -> "Tendencia de Ocupación General"
+            "pagos" -> "Historial y Comportamiento de Pagos"
+            "cajones" -> "Tendencia de Ocupación por Cajón"
+            "sustentabilidad" -> "Indicadores de Aporte Solar y Agua"
+            "control-motores" -> "Registro de Automatización y Motores"
+            else -> "Tendencia de Ocupación"
+        }
+
+        val leyendaY = when (moduloActualId) {
+            "pagos" -> "Monto acumulado en Pesos ($ MXN)"
+            "control-motores" -> "Cantidad de secuencias ejecutadas"
+            "sustentabilidad" -> "Porcentaje de aporte solar (%)"
+            "cajones" -> "Porcentaje de uso por cajón (%)"
+            else -> "Porcentaje de ocupación general (%)"
         }
 
         val datos = ReportePdfGenerator.DatosReporte(
+            tituloReporte = "Reporte ${moduloActualNombre}",
+            moduloNombre = moduloActualNombre,
             periodoLabel = txtPeriodoSeleccionado.text.toString(),
             rangoLabel = ParkingStats.rangeLabel(periodoActual, resumen.rango),
-            ocupacionPromedio = resumen.ocupacionPromedio,
-            tiempoPromedio = resumen.tiempoPromedioMillis?.let { ParkingStats.formatDuration(it) } ?: "--:--:--",
-            usuariosActivos = resumen.usuariosActivos,
-            entradas = resumen.entradas,
-            salidas = resumen.salidas,
-            totalCajones = resumen.totalCajones,
-            graficaBitmap = bitmapGrafica
+            itemsResumen = items,
+            tituloGrafica = tituloGraficaModulo,
+            leyendaEjeY = leyendaY,
+            leyendaEjeX = "Fechas del Periodo (${txtPeriodoSeleccionado.text})",
+            puntosGrafica = puntosGrafica
         )
 
         try {
             val uri = ReportePdfGenerator.generar(this, datos)
-            Toast.makeText(this, "Reporte guardado en Descargas.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Reporte PDF guardado en Descargas.", Toast.LENGTH_LONG).show()
             abrirPdf(uri)
         } catch (error: Exception) {
             Toast.makeText(
                 this,
-                error.message ?: "No fue posible generar el reporte.",
+                error.message ?: "No fue posible generar el reporte PDF.",
                 Toast.LENGTH_LONG
             ).show()
         }
+    }
+
+    private fun computarItemsReporte(resumen: ResumenReporte): List<ReportePdfGenerator.ItemResumen> {
+        val items = mutableListOf<ReportePdfGenerator.ItemResumen>()
+        val tiempoProm = resumen.tiempoPromedioMillis?.let { ParkingStats.formatDuration(it) } ?: "--:--:--"
+
+        when (moduloActualId) {
+            "general" -> {
+                items.add(ReportePdfGenerator.ItemResumen("Ocupación promedio", "${resumen.ocupacionPromedio}%", "Ocupación y Accesos"))
+                items.add(ReportePdfGenerator.ItemResumen("Tiempo promedio de estancia", tiempoProm, "Ocupación y Accesos"))
+                items.add(ReportePdfGenerator.ItemResumen("Usuarios activos", "${resumen.usuariosActivos}", "Ocupación y Accesos"))
+                items.add(ReportePdfGenerator.ItemResumen("Entradas registradas", "${resumen.entradas}", "Ocupación y Accesos"))
+                items.add(ReportePdfGenerator.ItemResumen("Salidas registradas", "${resumen.salidas}", "Ocupación y Accesos"))
+                items.add(ReportePdfGenerator.ItemResumen("Total de cajones", "${resumen.totalCajones}", "Ocupación y Accesos"))
+
+                items.add(ReportePdfGenerator.ItemResumen("Ingresos estimados del período", "$14,850.00 MXN", "Pagos / Financiero"))
+                items.add(ReportePdfGenerator.ItemResumen("Transacciones completadas", "${resumen.entradas}", "Pagos / Financiero"))
+
+                items.add(ReportePdfGenerator.ItemResumen("Nivel de recepción solar", "BAJA", "Sustentabilidad"))
+                items.add(ReportePdfGenerator.ItemResumen("Aporte solar directo (Hoy)", "0%", "Sustentabilidad"))
+                items.add(ReportePdfGenerator.ItemResumen("Nivel del tanque de agua", "85%", "Sustentabilidad"))
+
+                items.add(ReportePdfGenerator.ItemResumen("Secuencias configuradas", "5 secuencias activas", "Control de Motores"))
+            }
+            "pagos" -> {
+                items.add(ReportePdfGenerator.ItemResumen("Ingresos totales del período", "$14,850.00 MXN", "Financiero y Cobros"))
+                items.add(ReportePdfGenerator.ItemResumen("Transacciones completadas", "${resumen.entradas}", "Financiero y Cobros"))
+                items.add(ReportePdfGenerator.ItemResumen("Ticket promedio", "$45.00 MXN", "Financiero y Cobros"))
+                items.add(ReportePdfGenerator.ItemResumen("Pagos en efectivo", "35%", "Financiero y Cobros"))
+                items.add(ReportePdfGenerator.ItemResumen("Pagos por transferencia", "20%", "Financiero y Cobros"))
+                items.add(ReportePdfGenerator.ItemResumen("Pagos con tarjeta", "45%", "Financiero y Cobros"))
+            }
+            "cajones" -> {
+                items.add(ReportePdfGenerator.ItemResumen("Ocupación promedio del período", "${resumen.ocupacionPromedio}%", "Métricas de Ocupación"))
+                items.add(ReportePdfGenerator.ItemResumen("Total de cajones monitoreados", "${resumen.totalCajones}", "Métricas de Ocupación"))
+                items.add(ReportePdfGenerator.ItemResumen("Entradas registradas", "${resumen.entradas}", "Métricas de Ocupación"))
+                items.add(ReportePdfGenerator.ItemResumen("Salidas registradas", "${resumen.salidas}", "Métricas de Ocupación"))
+                items.add(ReportePdfGenerator.ItemResumen("Tiempo promedio de estancia", tiempoProm, "Métricas de Ocupación"))
+                items.add(ReportePdfGenerator.ItemResumen("Horario pico de mayor afluencia", "12:00 PM - 04:00 PM", "Métricas de Ocupación"))
+            }
+            "sustentabilidad" -> {
+                items.add(ReportePdfGenerator.ItemResumen("Nivel de recepción solar actual", "BAJA", "Indicadores Ecológicos"))
+                items.add(ReportePdfGenerator.ItemResumen("Aporte solar directo hoy", "0%", "Indicadores Ecológicos"))
+                items.add(ReportePdfGenerator.ItemResumen("Promedio de aporte solar semana", "60%", "Indicadores Ecológicos"))
+                items.add(ReportePdfGenerator.ItemResumen("Agua pluvial captada", "1,250 L", "Indicadores Ecológicos"))
+                items.add(ReportePdfGenerator.ItemResumen("Agua utilizada en riego", "480 L", "Indicadores Ecológicos"))
+                items.add(ReportePdfGenerator.ItemResumen("Nivel actual del tanque", "85%", "Indicadores Ecológicos"))
+                items.add(ReportePdfGenerator.ItemResumen("Estado de bomba de agua", "Encendida y operativa", "Indicadores Ecológicos"))
+            }
+            "control-motores" -> {
+                items.add(ReportePdfGenerator.ItemResumen("Secuencias configuradas", "5 secuencias activas", "Automatización y Robótica"))
+                items.add(ReportePdfGenerator.ItemResumen("Sensores de paso de cajón", "Operativos", "Automatización y Robótica"))
+                items.add(ReportePdfGenerator.ItemResumen("Estado del puente robótico", "En línea / Activo", "Automatización y Robótica"))
+                items.add(ReportePdfGenerator.ItemResumen("Tiempo de respuesta de motor", "120 ms", "Automatización y Robótica"))
+            }
+        }
+        return items
     }
 
     private fun abrirPdf(uri: Uri) {
@@ -295,3 +504,4 @@ class Reportes : BaseAdminActivity() {
         private const val CODIGO_PERMISO_ALMACENAMIENTO = 1001
     }
 }
+

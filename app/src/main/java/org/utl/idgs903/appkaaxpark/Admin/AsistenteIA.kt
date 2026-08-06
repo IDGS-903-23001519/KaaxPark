@@ -59,7 +59,56 @@ class AsistenteIA : BaseAdminActivity() {
         btnEnviar = findViewById(R.id.btnEnviarAI)
         contenedorMensajes = findViewById(R.id.contenedorMensajesAI)
         scrollMensajes = findViewById(R.id.scrollMensajesAI)
+        val cardInputAI = findViewById<View>(R.id.cardInputAI)
 
+        // Ajustar posición justa del campo de texto pegado al teclado (sin espacio sobrante)
+        var originalCardBottomY = 0
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { rootView, insets ->
+            val imeInset = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom
+
+            if (imeInset <= 0) {
+                cardInputAI.translationY = 0f
+                scrollMensajes.setPadding(
+                    scrollMensajes.paddingLeft,
+                    scrollMensajes.paddingTop,
+                    scrollMensajes.paddingRight,
+                    0
+                )
+                originalCardBottomY = 0
+            } else {
+                val rootHeight = rootView.height
+                val keyboardTop = rootHeight - imeInset
+
+                if (originalCardBottomY == 0) {
+                    val location = IntArray(2)
+                    cardInputAI.getLocationOnScreen(location)
+                    originalCardBottomY = location[1] + cardInputAI.height - cardInputAI.translationY.toInt()
+                }
+
+                val marginPx = (8 * resources.displayMetrics.density).toInt()
+                val overlap = originalCardBottomY - keyboardTop + marginPx
+                val shiftUp = overlap.coerceAtLeast(0)
+
+                cardInputAI.translationY = -shiftUp.toFloat()
+                scrollMensajes.setPadding(
+                    scrollMensajes.paddingLeft,
+                    scrollMensajes.paddingTop,
+                    scrollMensajes.paddingRight,
+                    shiftUp
+                )
+                scrollMensajes.post { scrollMensajes.fullScroll(View.FOCUS_DOWN) }
+            }
+            insets
+        }
+
+        txtPregunta.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                scrollMensajes.postDelayed({ scrollMensajes.fullScroll(View.FOCUS_DOWN) }, 250)
+            }
+        }
+        txtPregunta.setOnClickListener {
+            scrollMensajes.postDelayed({ scrollMensajes.fullScroll(View.FOCUS_DOWN) }, 250)
+        }
 
         agregarBurbuja(
             texto = getString(R.string.ai_greeting),
