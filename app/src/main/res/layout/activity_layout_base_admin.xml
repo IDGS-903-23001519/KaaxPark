@@ -34,6 +34,21 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
+        <!-- Título centralizado Admin -->
+        <TextView
+            android:id="@+id/txtTituloBaseAdmin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Admin Panel"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- ================= CONTENIDO ================= -->
@@ -60,7 +75,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="12dp"
-        android:background="@drawable/bg_bottom_nav"
+        android:background="@drawable/bg_bottom_nav_glass"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingVertical="8dp"
@@ -76,12 +91,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/imgNavDashboard"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:src="@drawable/icon_dashboard"/>
 
             <TextView
@@ -89,8 +106,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Dashboard"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp"/>
+                android:textColor="#8CFFFFFF"
+                android:textSize="11sp"
+                android:maxLines="1"/>
 
         </LinearLayout>
 
@@ -102,12 +120,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/imgNavCajones"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:src="@drawable/icon_cajones"/>
 
             <TextView
@@ -115,8 +135,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Cajones"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp"/>
+                android:textColor="#8CFFFFFF"
+                android:textSize="11sp"
+                android:maxLines="1"/>
 
         </LinearLayout>
 
@@ -124,24 +145,25 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="85dp"
             android:layout_weight="1"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnMenuCentralK"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardBackgroundColor="@color/gold_primary"
-                app:cardCornerRadius="32dp"
+                app:cardBackgroundColor="#F5C55A"
+                app:cardCornerRadius="35dp"
                 app:cardElevation="8dp">
 
                 <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="12dp"
                     android:src="@drawable/logo"/>
 
             </androidx.cardview.widget.CardView>
@@ -156,12 +178,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/imgNavReporte"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:src="@drawable/icon_reporte"/>
 
             <TextView
@@ -169,8 +193,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Reporte"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp"/>
+                android:textColor="#8CFFFFFF"
+                android:textSize="11sp"
+                android:maxLines="1"/>
 
         </LinearLayout>
 
@@ -182,21 +207,25 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/imgNavSustentabilidad"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:src="@drawable/icon_sustentabilidad"/>
 
             <TextView
                 android:id="@+id/txtNavSustentabilidad"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sustentabilidad"
-                android:textColor="#FFFFFF"
-                android:textSize="10sp"/>
+                android:text="Sustentab."
+                android:textColor="#8CFFFFFF"
+                android:textSize="10sp"
+                android:maxLines="1"
+                android:ellipsize="end"/>
 
         </LinearLayout>
 

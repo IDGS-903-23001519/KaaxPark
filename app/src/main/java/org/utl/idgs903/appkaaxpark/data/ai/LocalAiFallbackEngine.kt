@@ -98,13 +98,13 @@ object LocalAiFallbackEngine {
                 "Hay ${context.totalVehiculos} vehiculos registrados en el sistema."
 
             // 8. Otros (Tarifa, CO2, Árboles, etc.)
-            containsAny(normalized, listOf("tarifa", "costo", "precio", "cobro")) ->
+            containsAny(normalized, listOf("tarifa", "costo", "precio", "cobro", "cual es el costo", "cual es la tarifa")) ->
                 "La tarifa por hora configurada es ${formatMoney(context.tarifaPorHora)}."
 
-            containsAny(normalized, listOf("co2", "carbono", "evitamos", "evitar", "emisiones")) ->
+            containsAny(normalized, listOf("co2", "carbono", "evitamos", "evitar", "emisiones", "cual es el co2", "cual es el ahorro de co2")) ->
                 buildSustentabilidadCO2(context)
 
-            containsAny(normalized, listOf("arbol", "arboles", "equivalente", "salvados", "cuantos arboles")) ->
+            containsAny(normalized, listOf("arbol", "arboles", "equivalente", "salvados", "cuantos arboles", "cual es el equivalente en arboles")) ->
                 buildSustentabilidadArboles(context)
 
             containsAny(normalized, listOf("cuanto tiempo", "cuanto estuv", "tiempo que estuve", "cuanto estuve", "cuanto estuvo")) ->
@@ -121,6 +121,19 @@ object LocalAiFallbackEngine {
 
             containsAny(normalized, listOf("que dias", "dias que", "dias utilice", "dias use", "dias estuve")) ->
                 answerDaysForVehicle(normalized, context)
+
+            // Entradas y Salidas hoy
+            containsAny(normalized, listOf("entradas hoy", "cuantos entraron", "ingresos hoy", "vehiculos entraron", "entradas registradas")) ->
+                "Hoy han ingresado ${context.entradasHoy} vehiculos al estacionamiento."
+
+            containsAny(normalized, listOf("salidas hoy", "cuantos salieron", "retiros hoy", "vehiculos salieron", "salidas registradas")) ->
+                "Hoy se han registrado ${context.salidasHoy} salidas de vehiculos."
+
+            // Pagos en el historial
+            containsAny(normalized, listOf("cuanto he pagado", "gastado", "total de mis pagos", "dinero gastado")) -> {
+                val total = context.userVisits.sumOf { it.totalPagado }
+                "Hasta ahora has pagado un total de ${formatMoney(total)} en tus visitas registradas."
+            }
 
             // 9. Resumen y Fallback
             containsAny(normalized, listOf("resumen", "general", "estado general")) ->

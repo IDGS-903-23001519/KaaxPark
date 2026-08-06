@@ -32,6 +32,7 @@ class GestionUsuarios : BaseAdminActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setPageTitle("Usuarios")
 
         repository = FirebaseRepository()
 

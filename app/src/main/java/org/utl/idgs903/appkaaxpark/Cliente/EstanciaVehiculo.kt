@@ -46,6 +46,7 @@ class EstanciaVehiculo : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setPageTitle("Mi Estancia")
 
         txtSubtitulo = findViewById(R.id.txtSubtitulo)
         txtTiempoMarcador = findViewById(R.id.txtTiempoMarcador)

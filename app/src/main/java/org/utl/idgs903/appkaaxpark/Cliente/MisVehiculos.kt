@@ -26,6 +26,7 @@ class MisVehiculos : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setPageTitle("Mis Vehículos")
 
         contenedorVehiculos = findViewById(R.id.contenedorVehiculos)
         btnAgregarVehiculo = findViewById(R.id.btnAgregarVehiculo)

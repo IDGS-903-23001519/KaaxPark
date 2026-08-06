@@ -36,6 +36,7 @@ class Cajones : BaseAdminActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setPageTitle("Cajones")
 
         repository = FirebaseRepository()
         txtBuscarCajon = findViewById(R.id.txtBuscarCajon)

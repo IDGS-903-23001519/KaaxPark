@@ -34,6 +34,10 @@ class ClienteAsistenteIA : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setPageTitle("Asistente IA")
+
+        // Asegurar que el contenido suba con el teclado
+        window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         val session = sessionManager.getSession()
         userDocId = session?.userDocId?.takeIf { it.isNotBlank() }

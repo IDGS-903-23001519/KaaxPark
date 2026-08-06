@@ -28,6 +28,7 @@ class Sustentabilidad : BaseAdminActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setPageTitle("Sustentabilidad")
 
         repository = FirebaseRepository()
         viewNivelTanque = findViewById(R.id.viewNivelTanque)

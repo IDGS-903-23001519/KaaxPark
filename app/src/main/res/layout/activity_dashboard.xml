@@ -13,17 +13,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- ── Header ─────────────────────────────────────────────────────── -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="14dp"
-            android:text="Panel de Administración"
-            android:textColor="#FDFDFD"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -35,6 +35,7 @@ class RecuperarVehiculo : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setPageTitle("Retirar Vehículo")
 
         txtPregunta   = findViewById(R.id.txtPregunta)
         txtDescripcion = findViewById(R.id.txtDescripcion)

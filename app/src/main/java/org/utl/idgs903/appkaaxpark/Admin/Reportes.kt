@@ -8,9 +8,10 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.Menu
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
-import android.widget.PopupMenu
+import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -58,6 +59,7 @@ class Reportes : BaseAdminActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setPageTitle("Reportes")
 
         repository = FirebaseRepository()
         btnSelectorPeriodo = findViewById(R.id.btnSelectorPeriodo)
@@ -79,21 +81,37 @@ class Reportes : BaseAdminActivity() {
     }
 
     private fun mostrarSelectorPeriodo() {
-        val popup = PopupMenu(this, btnSelectorPeriodo)
-        popup.menu.add(Menu.NONE, ReportPeriod.DIA.ordinal, Menu.NONE, "Hoy")
-        popup.menu.add(Menu.NONE, ReportPeriod.SEMANA.ordinal, Menu.NONE, "Últimos 7 días")
-        popup.menu.add(Menu.NONE, ReportPeriod.MES.ordinal, Menu.NONE, "Últimos 30 días")
+        val vistaPopup = LayoutInflater.from(this)
+            .inflate(R.layout.popup_filtro_reportes, null)
 
-        popup.setOnMenuItemClickListener { item ->
-            val seleccionado = ReportPeriod.entries[item.itemId]
-            if (seleccionado != periodoActual) {
-                periodoActual = seleccionado
-                txtPeriodoSeleccionado.text = item.title
+        val popupWindow = PopupWindow(
+            vistaPopup,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            true
+        )
+        popupWindow.elevation = 8f
+
+        fun seleccionar(periodo: ReportPeriod, label: String) {
+            if (periodo != periodoActual) {
+                periodoActual = periodo
+                txtPeriodoSeleccionado.text = label
                 cargarReporte()
             }
-            true
+            popupWindow.dismiss()
         }
-        popup.show()
+
+        vistaPopup.findViewById<TextView>(R.id.opcionHoy).setOnClickListener {
+            seleccionar(ReportPeriod.DIA, "Hoy")
+        }
+        vistaPopup.findViewById<TextView>(R.id.opcionSemana).setOnClickListener {
+            seleccionar(ReportPeriod.SEMANA, "Últimos 7 días")
+        }
+        vistaPopup.findViewById<TextView>(R.id.opcionMes).setOnClickListener {
+            seleccionar(ReportPeriod.MES, "Últimos 30 días")
+        }
+
+        popupWindow.showAsDropDown(btnSelectorPeriodo, 0, 8)
     }
 
     private fun cargarReporte() {

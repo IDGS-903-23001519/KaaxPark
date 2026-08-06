@@ -53,6 +53,7 @@ class DetallePago : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setPageTitle("Detalle del Pago")
 
         txtTiempoTotalValor = findViewById(R.id.txtTiempoTotalValor)
         txtTarifaValor      = findViewById(R.id.txtTarifaValor)

@@ -36,6 +36,10 @@ abstract class BaseActivity : AppCompatActivity() {
             actualizarEstadoMenuNavegacion()
         }
 
+    protected fun setPageTitle(title: String) {
+        findViewById<TextView>(R.id.txtTituloBase)?.text = title
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -145,11 +149,16 @@ abstract class BaseActivity : AppCompatActivity() {
 
         if (this.javaClass != destino) {
             val intent = Intent(this, destino).apply {
-                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NO_ANIMATION
             }
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        overridePendingTransition(0, 0)
     }
 
     private fun marcarPantallaActiva() {

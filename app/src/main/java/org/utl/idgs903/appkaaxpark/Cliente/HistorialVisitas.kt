@@ -40,6 +40,7 @@ class HistorialVisitas : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setPageTitle("Historial")
 
         contenedorHistorial = findViewById(R.id.contenedorHistorial)
         txtSinRegistros = findViewById(R.id.txtSinRegistros)

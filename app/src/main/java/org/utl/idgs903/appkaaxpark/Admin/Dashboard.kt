@@ -61,6 +61,8 @@ class Dashboard : BaseAdminActivity() {
     // ── Lifecycle ─────────────────────────────────────────────────────────────
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setPageTitle("Dashboard")
+
         // setContentView NO va aquí — BaseAdminActivity ya infla
         // activity_layout_base_admin.xml y mete getLayoutId() en containerDashboard.
 

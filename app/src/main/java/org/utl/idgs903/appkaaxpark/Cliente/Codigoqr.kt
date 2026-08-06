@@ -58,6 +58,7 @@ class Codigoqr : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setPageTitle("Escaneo de QR")
 
         txtResultadoAsignacion = findViewById(R.id.txtResultadoAsignacion)
         contenedorVehiculosQR = findViewById(R.id.contenedorVehiculosQR)
@@ -72,9 +73,29 @@ class Codigoqr : BaseActivity() {
         mostrarEstado(EstadoPantalla.ESCANEO)
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Habilitar el botón cada vez que se regresa a la pantalla
+        btnIniciarEscaneo.isEnabled = true
+        verificarYRedirigirSiEstanciaActiva()
+        cargarVehiculos()
+    }
+
     override fun onStart() {
         super.onStart()
-        cargarVehiculos()
+    }
+
+    private fun verificarYRedirigirSiEstanciaActiva() {
+        val session = sessionManager.getSession() ?: return
+        repository.fetchClientStayDetails(session.userDocId) { result ->
+            val details = result.getOrNull()
+            if (details != null) {
+                // Si ya tiene una estancia, no debería estar aquí
+                runOnUiThread {
+                    irAEstancia()
+                }
+            }
+        }
     }
 
     // --- Control de las distintas pantallas (escanear / elegir vehículo / ya estacionado) ---
@@ -174,28 +195,46 @@ class Codigoqr : BaseActivity() {
     // --- Paso 1: escaneo del código QR de la entrada ---
 
     private fun iniciarEscaneo() {
-        scanner.startScan()
-            .addOnSuccessListener { barcode ->
-                val valorQr = barcode.rawValue?.trim()
-                if (valorQr.isNullOrEmpty()) {
-                    Toast.makeText(this, "No se pudo leer el código QR.", Toast.LENGTH_SHORT).show()
-                    return@addOnSuccessListener
+        // Asegurarse de que el botón no se presione dos veces
+        btnIniciarEscaneo.isEnabled = false
+        
+        try {
+            scanner.startScan()
+                .addOnSuccessListener { barcode ->
+                    btnIniciarEscaneo.isEnabled = true
+                    val valorQr = barcode.rawValue?.trim()
+                    if (valorQr.isNullOrEmpty()) {
+                        Toast.makeText(this, "No se pudo leer el código QR.", Toast.LENGTH_SHORT).show()
+                        return@addOnSuccessListener
+                    }
+                    if (!valorQr.equals(CODIGO_QR_ENTRADA, ignoreCase = true)) {
+                        Toast.makeText(
+                            this,
+                            "Ese código QR no corresponde a la entrada del estacionamiento.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        return@addOnSuccessListener
+                    }
+                    codigoEntradaValidado = true
+                    txtResultadoAsignacion.text = ""
+                    mostrarEstado(EstadoPantalla.SELECCION_VEHICULO)
                 }
-                if (!valorQr.equals(CODIGO_QR_ENTRADA, ignoreCase = true)) {
-                    Toast.makeText(
-                        this,
-                        "Ese código QR no corresponde a la entrada del estacionamiento.",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    return@addOnSuccessListener
+                .addOnFailureListener { e ->
+                    btnIniciarEscaneo.isEnabled = true
+                    val msg = if (e.message?.contains("Failed to scan", ignoreCase = true) == true || 
+                                 e.message?.contains("model", ignoreCase = true) == true) {
+                        "El escáner se está preparando. Intenta de nuevo en 5 segundos."
+                    } else if (e.message?.contains("cancel", ignoreCase = true) == true) {
+                        "Escaneo cancelado por el usuario."
+                    } else {
+                        "Error al escanear: ${e.message}"
+                    }
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
                 }
-                codigoEntradaValidado = true
-                txtResultadoAsignacion.text = ""
-                mostrarEstado(EstadoPantalla.SELECCION_VEHICULO)
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Escaneo cancelado o error: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        } catch (e: Exception) {
+            btnIniciarEscaneo.isEnabled = true
+            Toast.makeText(this, "No se pudo iniciar el escáner: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     // --- Paso 2: elegir con qué vehículo se entra (el cajón se asigna al azar) ---

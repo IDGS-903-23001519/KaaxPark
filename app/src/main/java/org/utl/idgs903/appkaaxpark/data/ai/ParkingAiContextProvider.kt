@@ -7,6 +7,8 @@ import org.utl.idgs903.appkaaxpark.data.ParkingStats
 import org.utl.idgs903.appkaaxpark.data.ReportPeriod
 import org.utl.idgs903.appkaaxpark.data.SustentabilidadInfo
 import org.utl.idgs903.appkaaxpark.data.VehicleInfo
+import java.text.SimpleDateFormat
+import java.util.Locale
 import kotlin.math.roundToInt
 
 class ParkingAiContextProvider(
@@ -63,6 +65,12 @@ class ParkingAiContextProvider(
         fun complete() {
             remaining -= 1
             if (remaining == 0) {
+                // Generar reporte diario para calcular visitas por día
+                val visitasPorDiaMap = estancias
+                    .filter { it.fechaSalida != null }
+                    .groupBy { SimpleDateFormat("yyyy-MM-dd", Locale.US).format(it.fechaEntrada.toDate()) }
+                    .mapValues { (_, items) -> items.size.toLong() }
+
                 callback(
                     Result.success(
                         buildContext(
@@ -72,7 +80,7 @@ class ParkingAiContextProvider(
                             tarifaPorHora = tarifaPorHora,
                             totalClientes = totalClientes,
                             totalVehiculos = totalVehiculos,
-                            visitasPorDia = emptyMap(),
+                            visitasPorDia = visitasPorDiaMap,
                             estanciaActualMinutos = estanciaActualMinutos,
                             vehiculoActual = vehiculoActual,
                             userVisits = userVisits,

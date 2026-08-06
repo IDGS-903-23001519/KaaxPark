@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="200dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog"
+    android:orientation="vertical"
+    android:elevation="8dp">
+
+    <TextView
+        android:id="@+id/opcionHoy"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:text="Hoy"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"/>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" />
+
+    <TextView
+        android:id="@+id/opcionSemana"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:text="Últimos 7 días"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"/>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" />
+
+    <TextView
+        android:id="@+id/opcionMes"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:text="Últimos 30 días"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"/>
+
+</LinearLayout>

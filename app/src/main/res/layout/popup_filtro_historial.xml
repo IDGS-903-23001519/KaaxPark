@@ -3,9 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="200dp"
     android:layout_height="wrap_content"
-    android:background="@drawable/borde_negro"
+    android:background="@drawable/bg_dialog"
     android:orientation="vertical"
-    android:elevation="6dp">
+    android:elevation="8dp">
 
     <TextView
         android:id="@+id/opcionTodos"
