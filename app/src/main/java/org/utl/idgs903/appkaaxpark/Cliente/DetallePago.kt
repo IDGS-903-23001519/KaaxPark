@@ -113,16 +113,17 @@ class DetallePago : BaseActivity() {
         }
     }
 
-    // ── Cálculo de montos (igual que la página web: por hora, sin IVA) ────────
+    // ── Cálculo de montos (Por hora o fracción, mínimo 1 hora) ────────
     private fun actualizarMontos() {
         val stay = estanciaActual ?: return
         elapsedMillis = max(0L, System.currentTimeMillis() - stay.entryTimestamp.toDate().time)
 
-        // Fórmula idéntica a PagosComponent.montoCalculado del web:
-        // ceil(max(1, ceil(minutos / 60))) * tarifaPorHora
-        val minutos = ceil(elapsedMillis / 60_000.0).toLong()
-        val horas   = max(1L, ceil(minutos / 60.0).toLong())
-        montoCalculado = horas * tarifaPorHora
+        // Cálculo por hora o fracción:
+        // Incluso con 0 segundos o minutos, se cobra la primera hora completa.
+        val totalMinutos = elapsedMillis / 60_000.0
+        val horasACobrar = max(1L, ceil(totalMinutos / 60.0).toLong())
+        
+        montoCalculado = horasACobrar * tarifaPorHora
 
         txtTiempoTotalValor.text = formatElapsedTime(elapsedMillis)
         txtTotalValor.text = String.format(Locale.getDefault(), "$%.0f MXN", montoCalculado)

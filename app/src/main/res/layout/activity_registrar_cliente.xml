@@ -53,6 +53,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginBottom="10dp"
         android:fillViewport="true"
+        android:isScrollContainer="true"
         android:scrollbars="none"
         app:layout_constraintTop_toBottomOf="@id/imgLogo"
         app:layout_constraintBottom_toTopOf="@id/layoutInferior"
@@ -148,6 +149,20 @@
                         android:textSize="15sp"/>
                 </LinearLayout>
 
+                <!-- Mensaje de Error Teléfono -->
+                <TextView
+                    android:id="@+id/txtErrorTelefonoReg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/bg_error_placa"
+                    android:padding="10dp"
+                    android:text="Número de teléfono inválido"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:gravity="center"
+                    android:visibility="gone" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -209,6 +224,20 @@
                         android:src="@drawable/icon_ojo"
                         app:tint="#8CFFFFFF"/>
                 </LinearLayout>
+
+                <!-- Mensaje de Error Correo -->
+                <TextView
+                    android:id="@+id/txtErrorCorreoReg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/bg_error_placa"
+                    android:padding="10dp"
+                    android:text="Este correo ya está registrado"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:gravity="center"
+                    android:visibility="gone" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -326,6 +355,20 @@
                         android:textColorHint="#4DFFFFFF"
                         android:textSize="15sp"/>
                 </LinearLayout>
+
+                <!-- Mensaje de Error Placa -->
+                <TextView
+                    android:id="@+id/txtErrorPlacaReg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/bg_error_placa"
+                    android:padding="10dp"
+                    android:text="Esta placa ya está registrada"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:gravity="center"
+                    android:visibility="gone" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnRegistrar"

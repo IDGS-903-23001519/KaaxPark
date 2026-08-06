@@ -79,14 +79,17 @@ class MotorMqttClientOnline private constructor() {
                 }
                 .exceptionally { err ->
                     // Mira este mensaje en Logcat para ver exactamente qué falló
-                    Log.e(TAG, "✗ Error al conectar: ${err.message}", err)
+                    Log.e(TAG, "✗ Error al conectar HiveMQ: ${err.message}", err)
+                    lastError = err.message ?: "Error desconocido al conectar"
                     null
                 }
-
         } catch (e: Exception) {
             Log.e(TAG, "✗ Excepción al construir cliente MQTT: ${e.message}", e)
+            lastError = e.message ?: "Error de inicialización"
         }
     }
+
+    private var lastError: String? = null
 
     private fun suscribirRespuestas() {
         client?.subscribeWith()
@@ -116,13 +119,29 @@ class MotorMqttClientOnline private constructor() {
     fun ejecutarPasos(pasos: List<Map<String, Any>>, callback: (Result<Unit>) -> Unit) {
         val c = client
         if (c == null || !c.state.isConnected) {
-            Log.w(TAG, "ejecutarPasos() sin conexión activa. Estado: ${c?.state}")
-            mainHandler.post {
-                callback(Result.failure(Exception("Sin conexión al broker en línea (HiveMQ)")))
-            }
+            Log.w(TAG, "ejecutarPasos() sin conexión activa. Intentando reconectar...")
+            conectar() // Intentar reconectar si se perdió la conexión
+            
+            mainHandler.postDelayed({
+                val retryC = client
+                if (retryClientConnected(retryC)) {
+                    enviarPasosMqtt(retryC!!, pasos, callback)
+                } else {
+                    val detail = if (lastError != null) ": $lastError" else ""
+                    callback(Result.failure(Exception("Sin conexión al broker HiveMQ$detail")))
+                }
+            }, 3000L) // Aumentamos tiempo de espera de reconexión
             return
         }
 
+        enviarPasosMqtt(c, pasos, callback)
+    }
+
+    private fun retryClientConnected(c: Mqtt3AsyncClient?): Boolean {
+        return c != null && c.state.isConnected
+    }
+
+    private fun enviarPasosMqtt(c: Mqtt3AsyncClient, pasos: List<Map<String, Any>>, callback: (Result<Unit>) -> Unit) {
         val id = UUID.randomUUID().toString().take(8)
         Log.d(TAG, "→ Publicando ejecutar_pasos id=$id (${pasos.size} pasos)")
 
@@ -140,7 +159,7 @@ class MotorMqttClientOnline private constructor() {
 
         mainHandler.postDelayed({
             pendientes.remove(id)?.invoke(Result.failure(Exception("sin respuesta del robot")))
-        }, 5000L)
+        }, 8000L) // Aumentamos a 8s por latencia de nube
 
         pendientes[id] = callback
 
@@ -151,6 +170,7 @@ class MotorMqttClientOnline private constructor() {
             .thenAccept { Log.d(TAG, "→ Publicado en $TOPIC_REQUEST") }
             .exceptionally { err ->
                 Log.e(TAG, "✗ Error al publicar: ${err.message}")
+                mainHandler.post { callback(Result.failure(err)) }
                 null
             }
     }

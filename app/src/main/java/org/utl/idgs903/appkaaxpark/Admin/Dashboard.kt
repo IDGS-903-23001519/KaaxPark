@@ -97,7 +97,8 @@ class Dashboard : BaseAdminActivity() {
         }
 
         // 2. Actividad de hoy: para conteos y gráfica por hora
-        val hoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        // Forzamos Locale.US para asegurar formato yyyy-MM-dd sin importar el idioma del cel.
+        val hoy = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
         cancelarActividadHoy = repository.listenActividadHoy(hoy) { lista ->
             actividadHoy = lista
             actualizarEstadisticas()
@@ -113,8 +114,8 @@ class Dashboard : BaseAdminActivity() {
 
     // ── Stat cards ────────────────────────────────────────────────────────────
     private fun actualizarEstadisticas() {
-        val entradas = actividadHoy.count { it.tipo == "entrada" }
-        val salidas  = actividadHoy.count { it.tipo == "salida" }
+        val entradas = actividadHoy.count { it.tipo.equals("entrada", ignoreCase = true) }
+        val salidas  = actividadHoy.count { it.tipo.equals("salida", ignoreCase = true) }
         val ocupados = cajones.count { it.estado.equals("Ocupado", ignoreCase = true) }
         val total    = cajones.size
         val pct      = if (total > 0) (ocupados * 100f / total).roundToInt() else 0
@@ -128,7 +129,7 @@ class Dashboard : BaseAdminActivity() {
     /** Promedio de estancias COMPLETADAS hoy — igual que el web. */
     private fun calcularTiempoPromedio(): String {
         val duraciones = actividadHoy
-            .filter { it.tipo == "salida" && it.duracionMin != null }
+            .filter { it.tipo.equals("salida", ignoreCase = true) && it.duracionMin != null }
             .mapNotNull { it.duracionMin }
         if (duraciones.isEmpty()) return "—"
         val avg = duraciones.average().roundToInt()
@@ -183,9 +184,10 @@ class Dashboard : BaseAdminActivity() {
                 it.hora.split(":").firstOrNull()?.toIntOrNull() == h
             }
             for (ev in eventosDeLaHora) {
-                when (ev.tipo) {
-                    "entrada" -> acumulado++
-                    "salida"  -> acumulado = max(0, acumulado - 1)
+                if (ev.tipo.equals("entrada", ignoreCase = true)) {
+                    acumulado++
+                } else if (ev.tipo.equals("salida", ignoreCase = true)) {
+                    acumulado = max(0, acumulado - 1)
                 }
             }
             labels.add(String.format("%02d:00", h))
@@ -257,7 +259,7 @@ class Dashboard : BaseAdminActivity() {
             row.addView(View(this).apply {
                 layoutParams = LinearLayout.LayoutParams(dp(8), dp(8)).apply { rightMargin = dp(12) }
                 setBackgroundColor(
-                    if (item.tipo == "entrada") Color.parseColor("#4CAF50")
+                    if (item.tipo.equals("entrada", ignoreCase = true)) Color.parseColor("#4CAF50")
                     else Color.parseColor("#F44336")
                 )
             })
@@ -268,12 +270,16 @@ class Dashboard : BaseAdminActivity() {
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
             info.addView(TextView(this).apply {
-                text     = if (item.tipo == "entrada") "Entrada de Vehículo" else "Salida de Vehículo"
+                // Si hay descripción detallada (Nivel, Cajón, Folio), la usamos.
+                // Si no, usamos el texto genérico por defecto.
+                text = if (item.descripcion.isNotBlank()) item.descripcion
+                       else if (item.tipo.equals("entrada", ignoreCase = true)) "Entrada de Vehículo"
+                       else "Salida de Vehículo"
                 setTextColor(Color.WHITE)
                 textSize = 13f
             })
             info.addView(TextView(this).apply {
-                text     = item.placa.ifBlank { "—" }
+                text = if (item.placa.isNotBlank()) "Placa: ${item.placa}" else "Placa: —"
                 setTextColor(Color.parseColor("#A0A0A0"))
                 textSize = 11f
             })

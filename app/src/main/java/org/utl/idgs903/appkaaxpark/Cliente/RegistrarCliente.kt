@@ -1,5 +1,8 @@
 package org.utl.idgs903.appkaaxpark.Cliente
 
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.content.Context
 import android.os.Bundle
 import android.text.InputType
 import android.util.Patterns
@@ -33,6 +36,10 @@ class RegistrarCliente : AppCompatActivity() {
     private lateinit var txtColor: EditText
     private lateinit var txtPlaca: EditText
 
+    private lateinit var txtErrorTelefono: TextView
+    private lateinit var txtErrorCorreo: TextView
+    private lateinit var txtErrorPlaca: TextView
+
     private lateinit var imgOjo: ImageView
     private lateinit var btnRegistrar: Button
     private lateinit var txtLoginRegresar: TextView
@@ -43,6 +50,10 @@ class RegistrarCliente : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Ajustar la ventana para que el contenido se desplace cuando aparezca el teclado
+        window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
         enableEdgeToEdge()
         WindowCompat.getInsetsController(window, window.decorView)?.apply {
             isAppearanceLightStatusBars = false
@@ -59,6 +70,10 @@ class RegistrarCliente : AppCompatActivity() {
         txtModelo = findViewById(R.id.txtModeloReg)
         txtColor = findViewById(R.id.txtColorReg)
         txtPlaca = findViewById(R.id.txtPlacaReg)
+
+        txtErrorTelefono = findViewById(R.id.txtErrorTelefonoReg)
+        txtErrorCorreo = findViewById(R.id.txtErrorCorreoReg)
+        txtErrorPlaca = findViewById(R.id.txtErrorPlacaReg)
 
         imgOjo = findViewById(R.id.imgOjoReg)
         btnRegistrar = findViewById(R.id.btnRegistrar)
@@ -109,16 +124,30 @@ class RegistrarCliente : AppCompatActivity() {
         txtColor.error = null
         txtPlaca.error = null
 
+        txtErrorTelefono.visibility = View.GONE
+        txtErrorCorreo.visibility = View.GONE
+        txtErrorPlaca.visibility = View.GONE
+
         var hasErrors = false
 
         if (nombre.isBlank()) {
-            txtNombre.error = "Ingresa tu nombre."
+            txtNombre.error = "Ingresa tu nombre completo."
+            hasErrors = true
+        } else if (nombre.length < 3) {
+            txtNombre.error = "El nombre es demasiado corto."
             hasErrors = true
         }
+
         if (telefono.isBlank() || telefono.length < 10) {
-            txtTelefono.error = "Ingresa un número de teléfono válido (10 dígitos)."
+            txtErrorTelefono.text = "Ingresa un número de teléfono de 10 dígitos."
+            txtErrorTelefono.visibility = View.VISIBLE
+            hasErrors = true
+        } else if (!Regex("^[0-9]+$").matches(telefono)) {
+            txtErrorTelefono.text = "El teléfono solo debe contener números."
+            txtErrorTelefono.visibility = View.VISIBLE
             hasErrors = true
         }
+
         if (correo.isBlank()) {
             txtCorreo.error = "Ingresa tu correo."
             hasErrors = true
@@ -126,24 +155,27 @@ class RegistrarCliente : AppCompatActivity() {
             txtCorreo.error = "Ingresa un correo válido."
             hasErrors = true
         }
+
         if (password.isBlank() || password.length < 6) {
             txtPassword.error = "La contraseña debe tener mínimo 6 caracteres."
             hasErrors = true
         }
+
         if (marca.isBlank()) {
-            txtMarca.error = "Ingresa la marca."
+            txtMarca.error = "Ingresa la marca del vehículo."
             hasErrors = true
         }
-        if (modelo.isBlank()) {
-            txtModelo.error = "Ingresa el modelo."
-            hasErrors = true
-        }
+
         if (color.isBlank()) {
-            txtColor.error = "Ingresa el color."
+            txtColor.error = "Ingresa el color del vehículo."
             hasErrors = true
         }
+
         if (placa.isBlank()) {
             txtPlaca.error = "Ingresa las placas del vehículo."
+            hasErrors = true
+        } else if (!validarFormatoPlaca(placa)) {
+            txtPlaca.error = "Formato de placa inválido (6-10 caracteres)."
             hasErrors = true
         }
 
@@ -162,6 +194,11 @@ class RegistrarCliente : AppCompatActivity() {
         color: String,
         placa: String
     ) {
+        // Ocultar teclado de forma segura
+        val view = this.currentFocus ?: btnRegistrar
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        imm?.hideSoftInputFromWindow(view.windowToken, 0)
+
         btnRegistrar.isEnabled = false
         Toast.makeText(this, "Registrando en K'áaxPark...", Toast.LENGTH_SHORT).show()
 
@@ -193,26 +230,52 @@ class RegistrarCliente : AppCompatActivity() {
     }
 
     private fun mostrarErrorRegistro(error: Throwable) {
-        when (error) {
-            is FirebaseAuthUserCollisionException -> {
-                txtCorreo.error = "Ese correo ya está registrado."
-                Toast.makeText(this, "Ese correo ya está en uso.", Toast.LENGTH_LONG).show()
+        val msg = error.message ?: ""
+        
+        // Limpiar errores previos
+        txtPlaca.error = null
+        txtCorreo.error = null
+        txtPassword.error = null
+        txtErrorTelefono.visibility = View.GONE
+        txtErrorCorreo.visibility = View.GONE
+        txtErrorPlaca.visibility = View.GONE
+
+        when {
+            msg.contains("placa ya está registrada", ignoreCase = true) -> {
+                txtErrorPlaca.text = msg
+                txtErrorPlaca.visibility = View.VISIBLE
+                txtPlaca.requestFocus()
             }
-            is FirebaseAuthWeakPasswordException -> {
+            msg.contains("ya está registrado", ignoreCase = true) -> {
+                txtErrorCorreo.text = "Este correo ya está registrado."
+                txtErrorCorreo.visibility = View.VISIBLE
+                txtCorreo.requestFocus()
+            }
+            error is FirebaseAuthUserCollisionException -> {
+                txtErrorCorreo.text = "Este correo ya está registrado."
+                txtErrorCorreo.visibility = View.VISIBLE
+                txtCorreo.requestFocus()
+            }
+            error is FirebaseAuthWeakPasswordException -> {
                 txtPassword.error = "La contraseña es muy débil."
-                Toast.makeText(this, "Usa una contraseña más segura.", Toast.LENGTH_LONG).show()
+                txtPassword.requestFocus()
             }
-            is FirebaseAuthInvalidCredentialsException -> {
+            error is FirebaseAuthInvalidCredentialsException -> {
                 txtCorreo.error = "El formato del correo no es válido."
-                Toast.makeText(this, "Revisa el correo ingresado.", Toast.LENGTH_LONG).show()
+                txtCorreo.requestFocus()
+            }
+            msg.contains("PERMISSION_DENIED", ignoreCase = true) -> {
+                Toast.makeText(this, "Error de permisos. Revisa tus reglas de Firebase.", Toast.LENGTH_LONG).show()
             }
             else -> {
-                Toast.makeText(
-                    this,
-                    error.message ?: "No se pudo completar el registro.",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(this, msg.ifBlank { "Error desconocido." }, Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun validarFormatoPlaca(placa: String): Boolean {
+        // Regex para placas: Alfanumérico (A-Z, 0-9), opcional guion, entre 6 y 10 caracteres
+        val regex = Regex("^[A-Z0-9-]{6,10}$")
+        return regex.matches(placa.uppercase())
     }
 }

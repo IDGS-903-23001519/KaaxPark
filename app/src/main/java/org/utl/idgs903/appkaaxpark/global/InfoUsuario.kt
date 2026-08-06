@@ -51,6 +51,7 @@ class InfoUsuario : AppCompatActivity() {
         sessionManager = SessionManager(this)
 
         txtNombre = findViewById(R.id.txtNombre)
+        txtRol = findViewById(R.id.txtRol)
         txtEstado = findViewById(R.id.txtEstado)
         txtEmail = findViewById(R.id.txtEmail)
         lblCampoSecundario = findViewById(R.id.lblCampoSecundario)
@@ -59,10 +60,8 @@ class InfoUsuario : AppCompatActivity() {
         txtMarcaModelo = findViewById(R.id.txtMarcaModelo)
         txtPlaca = findViewById(R.id.txtPlaca)
         txtColor = findViewById(R.id.txtColor)
-
-        txtRol = findViewById(R.id.txtRol)
-
         cardVehiculo = findViewById(R.id.cardVehiculo)
+
 
         val btnVolver = findViewById<android.widget.ImageView>(R.id.btnVolver)
         btnVolver?.setOnClickListener {

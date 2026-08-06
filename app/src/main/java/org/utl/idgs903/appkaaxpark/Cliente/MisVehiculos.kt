@@ -170,8 +170,9 @@ class MisVehiculos : BaseActivity() {
         val txtModelo = vista.findViewById<EditText>(R.id.txtModeloDialog)
         val txtColor = vista.findViewById<EditText>(R.id.txtColorDialog)
         val txtPlaca = vista.findViewById<EditText>(R.id.txtPlacaDialog)
-        val btnCancelar = vista.findViewById<CardView>(R.id.btnCancelarDialog)
-        val btnGuardar = vista.findViewById<CardView>(R.id.btnGuardarDialog)
+        val txtErrorPlaca = vista.findViewById<TextView>(R.id.txtErrorPlaca)
+        val btnCancelar = vista.findViewById<View>(R.id.btnCancelarDialog)
+        val btnGuardar = vista.findViewById<View>(R.id.btnGuardarDialog)
 
         // Sin título ni botones del propio AlertDialog: todo el diseño
         // (tarjeta, campos y botones) viene del layout para que se vea
@@ -190,31 +191,49 @@ class MisVehiculos : BaseActivity() {
             val color = txtColor.text.toString().trim()
             val placa = txtPlaca.text.toString().trim()
 
+            txtErrorPlaca.visibility = View.GONE
+
             if (marca.isBlank() || color.isBlank() || placa.isBlank()) {
                 Toast.makeText(this, "Completa marca, color y placa.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            guardarVehiculo(marca, modelo, color, placa)
-            dialogo.dismiss()
+            if (!validarFormatoPlaca(placa)) {
+                txtPlaca.error = "Formato de placa inválido (6-10 caracteres)."
+                Toast.makeText(this, "La placa debe tener entre 6 y 10 caracteres alfanuméricos.", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            // Deshabilitar botón para evitar doble clic
+            btnGuardar.isEnabled = false
+            
+            repository.addVehicle(usuarioId, marca, modelo, color, placa) { result ->
+                runOnUiThread {
+                    btnGuardar.isEnabled = true
+                    result.onSuccess {
+                        Toast.makeText(this, "Vehículo agregado correctamente.", Toast.LENGTH_SHORT).show()
+                        cargarVehiculos()
+                        dialogo.dismiss()
+                    }
+                    result.onFailure { error ->
+                        // Si hay error (como placa duplicada), mostramos el error en el campo y no cerramos el modal
+                        if (error.message?.contains("ya está registrada", ignoreCase = true) == true) {
+                            txtErrorPlaca.text = error.message
+                            txtErrorPlaca.visibility = View.VISIBLE
+                        } else {
+                            txtPlaca.error = error.message
+                        }
+                        Toast.makeText(this, error.message ?: "No se pudo agregar el vehículo.", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
         }
 
         dialogo.show()
     }
 
-    private fun guardarVehiculo(marca: String, modelo: String, color: String, placa: String) {
-        repository.addVehicle(usuarioId, marca, modelo, color, placa) { result ->
-            result.onSuccess {
-                Toast.makeText(this, "Vehículo agregado correctamente.", Toast.LENGTH_SHORT).show()
-                cargarVehiculos()
-            }
-            result.onFailure { error ->
-                Toast.makeText(
-                    this,
-                    error.message ?: "No se pudo agregar el vehículo.",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
+    private fun validarFormatoPlaca(placa: String): Boolean {
+        val regex = Regex("^[A-Z0-9-]{6,10}$")
+        return regex.matches(placa.uppercase())
     }
 }

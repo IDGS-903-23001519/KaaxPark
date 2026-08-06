@@ -25,6 +25,8 @@ class EstanciaVehiculo : BaseActivity() {
 
     private val timerHandler = Handler(Looper.getMainLooper())
     private var entryTimeMillis: Long? = null
+    private var paymentStatusListener: (() -> Unit)? = null
+    private var lastStayId: String? = null
 
     private val timerRunnable = object : Runnable {
         override fun run() {
@@ -68,6 +70,11 @@ class EstanciaVehiculo : BaseActivity() {
         stopTimer()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        paymentStatusListener?.invoke()
+    }
+
     private fun loadClientStay(showRefreshFeedback: Boolean = false) {
         if (!repository.isAuthenticated()) {
             sessionManager.clearSession()
@@ -94,6 +101,20 @@ class EstanciaVehiculo : BaseActivity() {
                         }
 
                         renderStay(profile, details)
+                        
+                        // Escuchar cambios en el estatus de pago si la estancia es la misma
+                        if (lastStayId != details.stay.documentId) {
+                            lastStayId = details.stay.documentId
+                            paymentStatusListener?.invoke() // Cancelar anterior
+                            
+                            paymentStatusListener = repository.listenStayStatus(details.stay.documentId) { status ->
+                                if (status.equals("PAGADA", ignoreCase = true)) {
+                                    Toast.makeText(this, "Pago detectado. Redirigiendo...", Toast.LENGTH_SHORT).show()
+                                    navigateToQr()
+                                }
+                            }
+                        }
+
                         if (showRefreshFeedback) {
                             Toast.makeText(this, "Informacion actualizada.", Toast.LENGTH_SHORT).show()
                         }
@@ -165,6 +186,12 @@ class EstanciaVehiculo : BaseActivity() {
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
+        startActivity(intent)
+        finish()
+    }
+
+    private fun navigateToQr() {
+        val intent = Intent(this, Codigoqr::class.java)
         startActivity(intent)
         finish()
     }

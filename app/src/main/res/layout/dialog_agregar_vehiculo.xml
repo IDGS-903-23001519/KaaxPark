@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/bg_glass_card_gold"
+    android:background="@drawable/bg_dialog"
     android:padding="24dp">
 
     <TextView
@@ -13,169 +13,173 @@
         android:layout_height="wrap_content"
         android:text="Agregar vehículo"
         android:textColor="#FDFDFD"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="18dp"
-        android:text="Completa los datos de tu auto"
-        android:textColor="#8CFFFFFF"
-        android:textSize="13sp" />
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="24dp"
+        android:text="Ingresa los datos para registrar un nuevo auto"
+        android:textColor="@color/glass_text_secondary"
+        android:textSize="14sp" />
 
     <!-- Marca -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="MARCA"
-        android:textColor="#F5C55A"
-        android:textSize="11sp"
+        android:textColor="@color/gold_primary"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:letterSpacing="0.05" />
 
     <EditText
         android:id="@+id/txtMarcaDialog"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/bg_input_glass"
+        android:layout_height="52dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_input_field"
         android:hint="Ej. Nissan"
         android:textColor="#FDFDFD"
         android:textColorHint="#4DFFFFFF"
         android:textSize="15sp"
-        android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp"
+        android:paddingHorizontal="16dp"
         android:inputType="textCapWords" />
 
     <!-- Modelo -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="16dp"
         android:text="MODELO (OPCIONAL)"
-        android:textColor="#F5C55A"
-        android:textSize="11sp"
+        android:textColor="@color/gold_primary"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:letterSpacing="0.05" />
 
     <EditText
         android:id="@+id/txtModeloDialog"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/bg_input_glass"
+        android:layout_height="52dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_input_field"
         android:hint="Ej. Versa"
         android:textColor="#FDFDFD"
         android:textColorHint="#4DFFFFFF"
         android:textSize="15sp"
-        android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp"
+        android:paddingHorizontal="16dp"
         android:inputType="textCapWords" />
 
     <!-- Color -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="16dp"
         android:text="COLOR"
-        android:textColor="#F5C55A"
-        android:textSize="11sp"
+        android:textColor="@color/gold_primary"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:letterSpacing="0.05" />
 
     <EditText
         android:id="@+id/txtColorDialog"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/bg_input_glass"
+        android:layout_height="52dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_input_field"
         android:hint="Ej. Gris"
         android:textColor="#FDFDFD"
         android:textColorHint="#4DFFFFFF"
         android:textSize="15sp"
-        android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp"
+        android:paddingHorizontal="16dp"
         android:inputType="textCapWords" />
 
     <!-- Placa -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="16dp"
         android:text="PLACA"
-        android:textColor="#F5C55A"
-        android:textSize="11sp"
+        android:textColor="@color/gold_primary"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:letterSpacing="0.05" />
 
     <EditText
         android:id="@+id/txtPlacaDialog"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/bg_input_glass"
+        android:layout_height="52dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_input_field"
         android:hint="Ej. ABC1234"
         android:textColor="#FDFDFD"
         android:textColorHint="#4DFFFFFF"
         android:textSize="15sp"
-        android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp"
+        android:paddingHorizontal="16dp"
         android:inputType="textCapCharacters" />
+
+    <!-- Mensaje de Error Personalizado -->
+    <TextView
+        android:id="@+id/txtErrorPlaca"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_error_placa"
+        android:padding="10dp"
+        android:text="Esta placa ya está registrada en el sistema"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:visibility="gone" />
 
     <!-- Botones -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="32dp"
         android:orientation="horizontal">
 
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:id="@+id/btnCancelarDialog"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="52dp"
             android:layout_weight="1"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="10dp"
             android:clickable="true"
             android:focusable="true"
-            app:cardCornerRadius="14dp"
-            app:cardBackgroundColor="@android:color/transparent"
-            android:background="@drawable/bg_glass_card"
-            app:cardElevation="0dp">
+            android:background="@drawable/bg_input_field"
+            android:gravity="center">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:text="Cancelar"
-                android:textColor="#8CFFFFFF"
+                android:textColor="@color/glass_text_secondary"
                 android:textStyle="bold"
-                android:textSize="15sp" />
-        </androidx.cardview.widget.CardView>
+                android:textSize="16sp" />
+        </LinearLayout>
 
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:id="@+id/btnGuardarDialog"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="52dp"
             android:layout_weight="1"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="10dp"
             android:clickable="true"
             android:focusable="true"
-            app:cardCornerRadius="14dp"
-            app:cardBackgroundColor="@android:color/transparent"
-            android:background="@drawable/bg_button_gold"
-            app:cardElevation="0dp">
+            android:background="@drawable/bg_boton_dorado_solido"
+            android:gravity="center">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:text="Guardar"
                 android:textColor="#241705"
                 android:textStyle="bold"
-                android:textSize="15sp" />
-        </androidx.cardview.widget.CardView>
+                android:textSize="16sp" />
+        </LinearLayout>
 
     </LinearLayout>
 

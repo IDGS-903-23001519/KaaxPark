@@ -1,6 +1,5 @@
 package org.utl.idgs903.appkaaxpark.Cliente
 
-import android.app.Dialog
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -11,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import org.utl.idgs903.appkaaxpark.MainActivity
 import org.utl.idgs903.appkaaxpark.R
 import org.utl.idgs903.appkaaxpark.data.VisitHistoryItem
@@ -190,6 +190,12 @@ class HistorialVisitas : BaseActivity() {
             vista.findViewById<TextView>(R.id.txtItemFecha).text = formatoFecha.format(fechaEntrada)
             vista.findViewById<TextView>(R.id.txtItemHora).text = formatoHora.format(fechaEntrada)
             vista.findViewById<TextView>(R.id.txtItemCajon).text = "Cajón: ${visita.cajonId}"
+            
+            // Si hay folio, lo mostramos debajo del cajón o reemplazamos
+            if (visita.folio.isNotBlank()) {
+                vista.findViewById<TextView>(R.id.txtItemCajon).text = "Folio: ${visita.folio}"
+            }
+
             vista.findViewById<TextView>(R.id.txtItemMonto).text =
                 String.format(Locale.getDefault(), "$%.2f", visita.montoTotal)
 
@@ -207,7 +213,9 @@ class HistorialVisitas : BaseActivity() {
 
         val formatoFechaHora = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
 
-        vistaDialogo.findViewById<TextView>(R.id.txtDetalleCajon).text = visita.cajonId
+        vistaDialogo.findViewById<TextView>(R.id.txtDetalleCajon).text = 
+            if (visita.folio.isNotBlank()) "${visita.cajonId} (${visita.folio})" else visita.cajonId
+
         vistaDialogo.findViewById<TextView>(R.id.txtDetalleFechaEntrada).text =
             formatoFechaHora.format(visita.fechaEntrada.toDate())
 
@@ -231,8 +239,10 @@ class HistorialVisitas : BaseActivity() {
         vistaDialogo.findViewById<TextView>(R.id.txtDetalleTotal).text =
             String.format(Locale.getDefault(), "$%.2f", visita.montoTotal)
 
-        val dialog = Dialog(this)
-        dialog.setContentView(vistaDialogo)
+        val dialog = AlertDialog.Builder(this)
+            .setView(vistaDialogo)
+            .create()
+
         dialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
 
         vistaDialogo.findViewById<LinearLayout>(R.id.btnCerrarDetalle).setOnClickListener {
@@ -240,9 +250,6 @@ class HistorialVisitas : BaseActivity() {
         }
 
         dialog.show()
-
-        val anchoDeseado = (resources.displayMetrics.widthPixels * 0.88).toInt()
-        dialog.window?.setLayout(anchoDeseado, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     private fun calcularTiempoTotal(entradaMillis: Long, salidaMillis: Long): String {

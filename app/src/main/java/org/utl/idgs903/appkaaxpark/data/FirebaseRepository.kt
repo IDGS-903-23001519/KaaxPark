@@ -64,7 +64,9 @@ data class VisitHistoryItem(
     val subtotal: Double,
     val iva: Double,
     val montoTotal: Double,
-    val metodoPago: String
+    val metodoPago: String,
+    val folio: String = "",
+    val placa: String = ""
 )
 
 data class EstanciaResumen(
@@ -123,7 +125,8 @@ data class ActividadDashboardItem(
     val tipo: String,
     val hora: String,
     val placa: String,
-    val duracionMin: Int?
+    val duracionMin: Int?,
+    val descripcion: String = ""
 )
 
 class FirebaseRepository(
@@ -446,15 +449,24 @@ class FirebaseRepository(
         usuarioId: String,
         callback: (Result<List<VisitHistoryItem>>) -> Unit
     ) {
-        firestore.collection("estancias")
-            .whereEqualTo("usuarioId", usuarioId)
-            .whereEqualTo("estatus", "FINALIZADA")
+        // Consultamos la colección 'pagos' ya que es la que tiene la información
+        // consolidada del pago, incluyendo folio, placa y estado 'Completado'.
+        firestore.collection("pagos")
+            .whereEqualTo("estado", "Completado")
             .get()
             .addOnSuccessListener { snapshot ->
-                val visitas = snapshot.documents
-                    .mapNotNull { it.toVisitHistoryItem() }
-                    .sortedByDescending { it.fechaSalida?.seconds ?: it.fechaEntrada.seconds }
-                callback(Result.success(visitas))
+                // Filtramos por la placa de los vehículos del usuario para asegurar
+                // que solo vea su historial.
+                fetchVehiclesByUserId(usuarioId) { vResult ->
+                    val placasUsuario = vResult.getOrNull()?.map { it.plate } ?: emptyList()
+                    
+                    val visitas = snapshot.documents
+                        .mapNotNull { it.toVisitHistoryItemFromPago() }
+                        .filter { it.placa in placasUsuario }
+                        .sortedByDescending { it.fechaSalida?.seconds ?: it.fechaEntrada.seconds }
+                    
+                    callback(Result.success(visitas))
+                }
             }
             .addOnFailureListener { error ->
                 callback(Result.failure(error))
@@ -528,11 +540,59 @@ class FirebaseRepository(
             codigoCajon
         }
             .addOnSuccessListener { assignedSpot ->
+                // Registrar actividad de entrada
+                registrarActividad(
+                    tipo = "entrada",
+                    vehiculoId = vehiculoId,
+                    cajonId = assignedSpot,
+                    duracionMin = null
+                )
                 callback(Result.success(assignedSpot))
             }
             .addOnFailureListener { error ->
                 callback(Result.failure(error))
             }
+    }
+
+    private fun registrarActividad(
+        tipo: String,
+        vehiculoId: String,
+        cajonId: String,
+        duracionMin: Int? = null,
+        folio: String? = null
+    ) {
+        val now = Date()
+        val fecha = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(now)
+        val hora = SimpleDateFormat("HH:mm", Locale.US).format(now)
+
+        fetchVehicleByDocumentId(vehiculoId) { result ->
+            val vehicle = result.getOrNull()
+            val placa = vehicle?.plate ?: ""
+            val marca = vehicle?.brand ?: ""
+            val modelo = vehicle?.model ?: ""
+
+            firestore.collection("cajones-dev").document(cajonId).get()
+                .addOnSuccessListener { cajonSnap ->
+                    val nivel = cajonSnap.getLong("nivel") ?: 0
+                    val numCajon = cajonSnap.getLong("numeroCajon") ?: 0
+                    
+                    var desc = "Nivel $nivel · Cajón $numCajon"
+                    if (!folio.isNullOrBlank()) desc += " · Folio $folio"
+                    else if (marca.isNotBlank()) desc += " · $marca $modelo"
+
+                    val actividad = hashMapOf(
+                        "tipo" to tipo,
+                        "fecha" to fecha,
+                        "hora" to hora,
+                        "placa" to placa,
+                        "timestamp" to System.currentTimeMillis(),
+                        "duracionMin" to (duracionMin ?: 0),
+                        "descripcion" to desc
+                    )
+
+                    firestore.collection("actividad").add(actividad)
+                }
+        }
     }
 
     // --- Pago de la estancia ---
@@ -571,18 +631,40 @@ class FirebaseRepository(
         val estanciaRef = firestore.collection("estancias").document(estanciaId)
         val cajonRef = firestore.collection("cajones-dev").document(cajonId)
 
-        firestore.runTransaction<Unit> { transaction ->
-            transaction.update(
-                estanciaRef,
-                mapOf(
-                    "estatus" to "FINALIZADA",
-                    "fechaSalida" to Timestamp.now()
-                )
-            )
-            transaction.update(cajonRef, "estado", "Libre")
-            Unit
-        }
-            .addOnSuccessListener { callback(Result.success(Unit)) }
+        firestore.collection("estancias").document(estanciaId).get()
+            .addOnSuccessListener { estanciaSnap ->
+                val vehiculoId = estanciaSnap.getString("vehiculoId") ?: ""
+                val fechaEntrada = estanciaSnap.getTimestamp("fechaEntrada")
+                val folio = estanciaSnap.getString("folio") // si tienes folio en estancia
+
+                firestore.runTransaction<Unit> { transaction ->
+                    transaction.update(
+                        estanciaRef,
+                        mapOf(
+                            "estatus" to "FINALIZADA",
+                            "fechaSalida" to Timestamp.now()
+                        )
+                    )
+                    transaction.update(cajonRef, "estado", "Libre")
+                    Unit
+                }
+                    .addOnSuccessListener {
+                        val duracionMin = if (fechaEntrada != null) {
+                            val diff = System.currentTimeMillis() - fechaEntrada.toDate().time
+                            (diff / 60000L).toInt()
+                        } else 0
+
+                        registrarActividad(
+                            tipo = "salida",
+                            vehiculoId = vehiculoId,
+                            cajonId = cajonId,
+                            duracionMin = duracionMin,
+                            folio = folio
+                        )
+                        callback(Result.success(Unit))
+                    }
+                    .addOnFailureListener { error -> callback(Result.failure(error)) }
+            }
             .addOnFailureListener { error -> callback(Result.failure(error)) }
     }
 
@@ -612,9 +694,8 @@ class FirebaseRepository(
     }
 
     /**
-     * Agrega un nuevo vehículo a la cuenta del usuario. Si es el primer
-     * vehículo (sin contar los eliminados) que registra, se marca
-     * automáticamente como "en uso".
+     * Agrega un nuevo vehículo a la cuenta del usuario. Verifica que la placa
+     * no esté registrada por ningún otro usuario activo.
      */
     fun addVehicle(
         usuarioId: String,
@@ -624,32 +705,44 @@ class FirebaseRepository(
         placa: String,
         callback: (Result<Unit>) -> Unit
     ) {
+        // Primero verificamos si la placa ya existe en el sistema (no eliminada)
         firestore.collection("vehiculos")
-            .whereEqualTo("usuarioId", usuarioId)
+            .whereEqualTo("placa", placa.uppercase().trim())
+            .whereEqualTo("eliminado", false)
             .get()
-            .addOnSuccessListener { snapshot ->
-                val vehiculosVigentes = snapshot.documents.filter { !it.estaEliminado() }
-                val esElPrimerVehiculo = vehiculosVigentes.isEmpty()
-                val nuevoVehiculo = firestore.collection("vehiculos").document()
+            .addOnSuccessListener { plateSnapshot ->
+                if (!plateSnapshot.isEmpty) {
+                    callback(Result.failure(Exception("Esta placa ya está registrada en el sistema.")))
+                    return@addOnSuccessListener
+                }
 
-                val datos = hashMapOf(
-                    "usuarioId" to usuarioId,
-                    "marca" to marca,
-                    "modelo" to modelo,
-                    "color" to color,
-                    "placa" to placa,
-                    "activo" to esElPrimerVehiculo,
-                    "eliminado" to false,
-                    "fechaRegistro" to Timestamp.now()
-                )
+                // Si no existe, procedemos a agregar
+                firestore.collection("vehiculos")
+                    .whereEqualTo("usuarioId", usuarioId)
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        val vehiculosVigentes = snapshot.documents.filter { !it.estaEliminado() }
+                        val esElPrimerVehiculo = vehiculosVigentes.isEmpty()
+                        val nuevoVehiculo = firestore.collection("vehiculos").document()
 
-                nuevoVehiculo.set(datos)
-                    .addOnSuccessListener { callback(Result.success(Unit)) }
+                        val datos = hashMapOf(
+                            "usuarioId" to usuarioId,
+                            "marca" to marca,
+                            "modelo" to modelo,
+                            "color" to color,
+                            "placa" to placa.uppercase().trim(),
+                            "activo" to esElPrimerVehiculo,
+                            "eliminado" to false,
+                            "fechaRegistro" to Timestamp.now()
+                        )
+
+                        nuevoVehiculo.set(datos)
+                            .addOnSuccessListener { callback(Result.success(Unit)) }
+                            .addOnFailureListener { error -> callback(Result.failure(error)) }
+                    }
                     .addOnFailureListener { error -> callback(Result.failure(error)) }
             }
-            .addOnFailureListener { error ->
-                callback(Result.failure(error))
-            }
+            .addOnFailureListener { error -> callback(Result.failure(error)) }
     }
 
     /**
@@ -814,34 +907,71 @@ class FirebaseRepository(
         placa: String,
         callback: (Result<Unit>) -> Unit
     ) {
+        // Iniciamos con Auth.createUser para que el usuario esté autenticado.
+        // Esto permite que las reglas "request.auth != null" de tu Firebase autoricen 
+        // las consultas de validación (placa y admin) que siguen.
         auth.createUserWithEmailAndPassword(correo, password)
             .addOnSuccessListener { authResult ->
                 val firebaseUser = authResult.user
-                val firebaseUid = firebaseUser?.uid
 
-                if (firebaseUid.isNullOrBlank()) {
-                    callback(Result.failure(IllegalStateException("No se pudo obtener el UID del usuario recién creado.")))
-                    return@addOnSuccessListener
-                }
+                // Ahora que estamos autenticados, verificamos si es administrador
+                firestore.collection("usuarios")
+                    .whereEqualTo("email", correo.lowercase().trim())
+                    .get()
+                    .addOnSuccessListener { adminSnapshot ->
+                        if (!adminSnapshot.isEmpty) {
+                            // Si es admin, no puede registrarse como cliente. 
+                            // Borramos el usuario de Auth y salimos.
+                            firebaseUser?.delete()
+                            auth.signOut()
+                            callback(Result.failure(Exception("Este correo ya está registrado.")))
+                            return@addOnSuccessListener
+                        }
 
-                createUserDocument(firebaseUid, nombre, correo, telefono) { userResult ->
-                    userResult.onSuccess { usuarioDocId ->
-                        createVehicleDocument(usuarioDocId, marca, modelo, color, placa) { vehicleResult ->
-                            vehicleResult.onSuccess {
-                                auth.signOut()
-                                callback(Result.success(Unit))
+                        // Verificamos si la placa ya existe
+                        firestore.collection("vehiculos")
+                            .whereEqualTo("placa", placa.uppercase().trim())
+                            .whereEqualTo("eliminado", false)
+                            .get()
+                            .addOnSuccessListener { plateSnapshot ->
+                                if (!plateSnapshot.isEmpty) {
+                                    // Placa duplicada: borrar usuario de Auth y salir.
+                                    firebaseUser?.delete()
+                                    auth.signOut()
+                                    callback(Result.failure(Exception("Esta placa ya está registrada en el sistema.")))
+                                    return@addOnSuccessListener
+                                }
+
+                                // Si todo es correcto, crear los documentos definitivos
+                                val firebaseUid = firebaseUser?.uid ?: ""
+                                createUserDocument(firebaseUid, nombre, correo, telefono) { userResult ->
+                                    userResult.onSuccess { usuarioDocId ->
+                                        createVehicleDocument(usuarioDocId, marca.trim(), modelo.trim(), color.trim(), placa.uppercase().trim()) { vehicleResult ->
+                                            vehicleResult.onSuccess {
+                                                auth.signOut()
+                                                callback(Result.success(Unit))
+                                            }
+                                            vehicleResult.onFailure { error ->
+                                                rollbackRegistration(firebaseUser)
+                                                callback(Result.failure(error))
+                                            }
+                                        }
+                                    }
+                                    userResult.onFailure { error ->
+                                        rollbackRegistration(firebaseUser)
+                                        callback(Result.failure(error))
+                                    }
+                                }
                             }
-                            vehicleResult.onFailure { error ->
+                            .addOnFailureListener { error ->
                                 rollbackRegistration(firebaseUser)
                                 callback(Result.failure(error))
                             }
-                        }
                     }
-                    userResult.onFailure { error ->
+                    .addOnFailureListener { error ->
                         rollbackRegistration(firebaseUser)
                         callback(Result.failure(error))
                     }
-                }
             }
             .addOnFailureListener { error ->
                 callback(Result.failure(error))
@@ -1030,6 +1160,41 @@ class FirebaseRepository(
         )
     }
 
+    private fun DocumentSnapshot.toVisitHistoryItemFromPago(): VisitHistoryItem? {
+        if (!exists()) return null
+        
+        val cajonId = getString("cajonId").orEmpty().trim()
+        val placa = getString("placa").orEmpty().trim()
+        val folio = getString("folio").orEmpty().trim()
+        val metodo = getString("metodo").orEmpty().trim()
+        val monto = getDouble("monto") ?: 0.0
+        
+        // El documento de pago tiene horaEntrada y horaSalida como Strings (HH:mm)
+        // y fecha como String (yyyy-MM-dd). Necesitamos convertirlos a Timestamp.
+        val fechaStr = getString("fecha") ?: return null
+        val hEntrada = getString("horaEntrada") ?: "00:00"
+        val hSalida = getString("horaSalida") ?: "00:00"
+        
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US)
+        val dateEntrada = try { sdf.parse("$fechaStr $hEntrada") } catch (e: Exception) { null }
+        val dateSalida = try { sdf.parse("$fechaStr $hSalida") } catch (e: Exception) { null }
+        
+        if (dateEntrada == null) return null
+
+        return VisitHistoryItem(
+            documentId = id,
+            cajonId = cajonId,
+            fechaEntrada = Timestamp(dateEntrada),
+            fechaSalida = dateSalida?.let { Timestamp(it) },
+            subtotal = monto, // En pagos parece que guardamos monto final
+            iva = 0.0,
+            montoTotal = monto,
+            metodoPago = metodo,
+            folio = folio,
+            placa = placa
+        )
+    }
+
     private fun DocumentSnapshot.toVisitHistoryItem(): VisitHistoryItem? {
         if (!exists()) return null
         val cajonId = getString("cajonId").orEmpty().trim()
@@ -1075,12 +1240,11 @@ class FirebaseRepository(
 
     // ─── TARIFA ─────────────────────────────────────────────────────────────────
     /**
-     * Lee la tarifa por hora desde el mismo documento que usa la página web.
+     * Lee la tarifa por hora desde el documento 'configuracion/tarifas'.
      * Si no existe el documento, devuelve 60.0 como valor por defecto.
-     * Ajusta 'configuracion/tarifa' si tu web usa otra ruta en getTarifa().
      */
     fun fetchTarifaPorHora(callback: (Result<Double>) -> Unit) {
-        firestore.collection("configuracion").document("tarifa")
+        firestore.collection("configuracion").document("tarifas")
             .get()
             .addOnSuccessListener { snapshot ->
                 val tarifa = snapshot.getDouble("tarifaPorHora") ?: 60.0
@@ -1227,6 +1391,19 @@ class FirebaseRepository(
         return { registration.remove() }
     }
 
+    /**
+     * Escucha en tiempo real el campo 'estatusPago' de una estancia.
+     * Útil para detectar cuando un pago se realiza externamente (ej. sitio web).
+     */
+    fun listenStayStatus(estanciaId: String, onCambio: (String) -> Unit): () -> Unit {
+        val registration = firestore.collection("estancias").document(estanciaId)
+            .addSnapshotListener { snapshot, _ ->
+                val estado = snapshot?.getString("estatusPago") ?: return@addSnapshotListener
+                onCambio(estado)
+            }
+        return { registration.remove() }
+    }
+
     // ─── CONTADORES GLOBALES ─────────────────────────────────────────────────
 
     /**
@@ -1234,6 +1411,18 @@ class FirebaseRepository(
      */
     fun fetchClientCount(callback: (Result<Int>) -> Unit) {
         firestore.collection("usuariosc")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                callback(Result.success(snapshot.size()))
+            }
+            .addOnFailureListener { error -> callback(Result.failure(error)) }
+    }
+
+    /**
+     * Cuenta los administradores registrados en la colección 'usuarios'.
+     */
+    fun fetchAdminCount(callback: (Result<Int>) -> Unit) {
+        firestore.collection("usuarios")
             .get()
             .addOnSuccessListener { snapshot ->
                 callback(Result.success(snapshot.size()))
@@ -1255,16 +1444,28 @@ class FirebaseRepository(
             .addOnFailureListener { error -> callback(Result.failure(error)) }
     }
 
-    fun fetchAdminCount(callback: (Result<Int>) -> Unit) {
-        firestore.collection("usuarios")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val count = snapshot.documents.count {
-                    it.getString("puesto")?.equals("Administrador", ignoreCase = true) == true
+    fun fetchAllUsers(callback: (Result<List<UserProfile>>) -> Unit) {
+        val taskAdmin = firestore.collection("usuarios").get()
+        val taskCliente = firestore.collection("usuariosc").get()
+
+        com.google.android.gms.tasks.Tasks.whenAllComplete(taskAdmin, taskCliente)
+            .addOnCompleteListener {
+                val list = mutableListOf<UserProfile>()
+
+                if (taskAdmin.isSuccessful) {
+                    taskAdmin.result?.documents?.mapNotNullTo(list) { it.toUserProfile() }
                 }
-                callback(Result.success(count))
+                if (taskCliente.isSuccessful) {
+                    taskCliente.result?.documents?.mapNotNullTo(list) { it.toUserProfile() }
+                }
+
+                if (list.isEmpty() && (!taskAdmin.isSuccessful || !taskCliente.isSuccessful)) {
+                    val error = taskAdmin.exception ?: taskCliente.exception
+                    callback(Result.failure(error ?: Exception("No se pudieron cargar los usuarios.")))
+                } else {
+                    callback(Result.success(list.sortedBy { it.name.lowercase() }))
+                }
             }
-            .addOnFailureListener { error -> callback(Result.failure(error)) }
     }
 
     
@@ -1415,7 +1616,8 @@ class FirebaseRepository(
                         tipo       = tipo,
                         hora       = hora,
                         placa      = doc.getString("placa").orEmpty(),
-                        duracionMin = doc.getLong("duracionMin")?.toInt()
+                        duracionMin = doc.getLong("duracionMin")?.toInt(),
+                        descripcion = doc.getString("descripcion").orEmpty()
                     )
                 }
                 onUpdate(list)
@@ -1440,7 +1642,8 @@ class FirebaseRepository(
                         tipo       = tipo,
                         hora       = hora,
                         placa      = doc.getString("placa").orEmpty(),
-                        duracionMin = doc.getLong("duracionMin")?.toInt()
+                        duracionMin = doc.getLong("duracionMin")?.toInt(),
+                        descripcion = doc.getString("descripcion").orEmpty()
                     )
                 }
                 onUpdate(list)

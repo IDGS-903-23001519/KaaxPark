@@ -59,6 +59,8 @@ abstract class BaseAdminActivity : AppCompatActivity() {
         btnMenuSustentabilidad?.setOnClickListener { viajarA(Sustentabilidad::class.java) }
         btnInfoUsuario?.setOnClickListener { viajarA(InfoUsuario::class.java) }
 
+        btnMenuCentralK?.setOnClickListener { viajarA(AsistenteIA::class.java) }
+
 
     }
 

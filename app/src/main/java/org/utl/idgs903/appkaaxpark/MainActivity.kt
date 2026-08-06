@@ -32,6 +32,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import org.utl.idgs903.appkaaxpark.Admin.Dashboard
 import org.utl.idgs903.appkaaxpark.Cliente.Codigoqr
+import org.utl.idgs903.appkaaxpark.Cliente.EstanciaVehiculo
 import org.utl.idgs903.appkaaxpark.Cliente.RegistrarCliente
 import org.utl.idgs903.appkaaxpark.data.FirebaseRepository
 import org.utl.idgs903.appkaaxpark.data.InactiveUserException
@@ -340,22 +341,44 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun navigateToRoleHome(profile: UserProfile) {
-        val destination = when {
-            profile.role.equals("ADMIN", ignoreCase = true) -> Dashboard::class.java
-            profile.role.equals("CLIENTE", ignoreCase = true) -> Codigoqr::class.java
-            else -> {
-                repository.signOut()
-                sessionManager.clearSession()
-                Toast.makeText(this, "El rol del usuario no es valido.", Toast.LENGTH_LONG).show()
-                return
+        if (profile.role.equals("ADMIN", ignoreCase = true)) {
+            val intent = Intent(this, Dashboard::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
+            startActivity(intent)
+            finish()
+            return
         }
 
-        val intent = Intent(this, destination).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        if (profile.role.equals("CLIENTE", ignoreCase = true)) {
+            // Antes de ir a Codigoqr, verificamos si el cliente tiene una estancia activa
+            setLoadingState(isLoading = true)
+            repository.fetchClientStayDetails(profile.documentId) { result ->
+                runOnUiThread {
+                    setLoadingState(isLoading = false)
+                    val details = result.getOrNull()
+                    val destination: Class<*> = if (details != null) {
+                        // Si tiene estancia activa, lo mandamos a la pantalla de tiempo
+                        EstanciaVehiculo::class.java
+                    } else {
+                        // Si no, al QR para escanear
+                        Codigoqr::class.java
+                    }
+
+                    val intent = Intent(this, destination).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                    startActivity(intent)
+                    finish()
+                }
+            }
+            return
         }
-        startActivity(intent)
-        finish()
+
+        // Rol no reconocido
+        repository.signOut()
+        sessionManager.clearSession()
+        Toast.makeText(this, "El rol del usuario no es valido.", Toast.LENGTH_LONG).show()
     }
 
     private fun setLoadingState(isLoading: Boolean) {

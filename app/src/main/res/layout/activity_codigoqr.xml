@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Cliente.Codigoqr"
-    android:background="@drawable/bg_screen_glass">
+    tools:context=".Cliente.Codigoqr">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -30,7 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="10dp"
                 android:text="Escanear Código QR"
                 android:textColor="#FFFFFF"
                 android:textSize="22sp"

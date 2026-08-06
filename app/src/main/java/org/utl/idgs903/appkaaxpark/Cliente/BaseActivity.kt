@@ -30,7 +30,7 @@ abstract class BaseActivity : AppCompatActivity() {
     abstract fun getLayoutId(): Int
 
 
-    protected var navegacionBloqueada: Boolean = false
+    protected var navegacionBloqueada: Boolean = true
         set(value) {
             field = value
             actualizarEstadoMenuNavegacion()
@@ -132,8 +132,9 @@ abstract class BaseActivity : AppCompatActivity() {
         val esHistorial = destino == HistorialVisitas::class.java
         val esPerfil = destino == InfoUsuario::class.java
         val esQR = destino == Codigoqr::class.java
+        val esMisVehiculos = destino == MisVehiculos::class.java
 
-        if (navegacionBloqueada && !esHistorial && !esPerfil && !esQR) {
+        if (navegacionBloqueada && !esHistorial && !esPerfil && !esQR && !esMisVehiculos) {
             Toast.makeText(
                 this,
                 "Escanea el codigo QR de entrada para continuar.",
